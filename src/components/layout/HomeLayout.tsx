@@ -1,18 +1,18 @@
 import { ReactNode } from 'react';
-import { Header } from './Header';
+import { HomeHeader } from './HomeHeader';
 import { Footer } from './Footer';
 import { WhatsAppButton } from './WhatsAppButton';
 
-interface LayoutProps {
+interface HomeLayoutProps {
   children: ReactNode;
   showFooter?: boolean;
 }
 
-export const Layout = ({ children, showFooter = false }: LayoutProps) => {
+export const HomeLayout = ({ children, showFooter = false }: HomeLayoutProps) => {
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
-      <main className="flex-1 pt-32 md:pt-28">
+      <HomeHeader />
+      <main className="flex-1">
         {children}
       </main>
       {showFooter && <Footer />}

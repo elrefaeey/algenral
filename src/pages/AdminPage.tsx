@@ -17,6 +17,7 @@ import { getCars, getBookings } from '@/services/firebaseService';
 import { Car as CarType, Booking } from '@/types';
 import { AdminCars } from '@/components/admin/AdminCars';
 import { AdminBookings } from '@/components/admin/AdminBookings';
+import { useSEO } from '@/hooks/useSEO';
 import { toast } from 'sonner';
 
 type TabType = 'dashboard' | 'cars' | 'bookings';
@@ -28,6 +29,13 @@ const AdminPage = () => {
   const [loading, setLoading] = useState(true);
   const { user, logout, isAdmin } = useAuth();
   const navigate = useNavigate();
+
+  // Block from search engines
+  useSEO({
+    title: 'Admin Dashboard - AL GENERAL CAR RENTAL',
+    description: 'Admin access only',
+    noindex: true
+  });
 
   useEffect(() => {
     if (!isAdmin) {

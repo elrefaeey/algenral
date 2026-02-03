@@ -35,7 +35,7 @@ export const CarCard = ({ car, index = 0 }: CarCardProps) => {
         {car.images && car.images.length > 0 ? (
           <img
             src={car.images[0]}
-            alt={car.nameAr}
+            alt={`تأجير ${car.nameAr} في دبي - ${car.name} ${car.year}`}
             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
           />
         ) : (

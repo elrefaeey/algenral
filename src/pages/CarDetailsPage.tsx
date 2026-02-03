@@ -7,6 +7,10 @@ import { BookingForm } from '@/components/booking/BookingForm';
 import { getCar } from '@/services/firebaseService';
 import { Car } from '@/types';
 import { Badge } from '@/components/ui/badge';
+import { useSEO } from '@/hooks/useSEO';
+import { generateCarTitle, generateCarDescription, generateCarKeywords, getCanonicalUrl } from '@/utils/seoHelpers';
+import { SchemaProduct } from '@/components/seo/SchemaProduct';
+import { SchemaBreadcrumb } from '@/components/seo/SchemaBreadcrumb';
 
 const fuelTypeLabels = {
   petrol: 'بنزين',
@@ -25,6 +29,15 @@ const CarDetailsPage = () => {
   const [car, setCar] = useState<Car | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState(0);
+
+  // SEO Configuration - Dynamic based on car data
+  useSEO({
+    title: car ? generateCarTitle(car) : 'تفاصيل السيارة | AL GENERAL CAR RENTAL',
+    description: car ? generateCarDescription(car) : 'تفاصيل السيارة للإيجار في دبي',
+    keywords: car ? generateCarKeywords(car) : 'تأجير سيارات دبي',
+    canonical: getCanonicalUrl(`/cars/${id}`),
+    ogImage: car?.images?.[0] ? `https://algenral.vercel.app${car.images[0]}` : 'https://algenral.vercel.app/src/assets/logo.png'
+  });
 
   useEffect(() => {
     const fetchCar = async () => {
@@ -66,35 +79,15 @@ const CarDetailsPage = () => {
 
   return (
     <Layout>
+      {/* SEO Schema Components */}
+      {car && <SchemaProduct car={car} />}
+      <SchemaBreadcrumb items={[
+        { name: 'الرئيسية', url: '/' },
+        { name: 'السيارات', url: '/cars' },
+        { name: car?.nameAr || 'تفاصيل السيارة', url: `/cars/${id}` }
+      ]} />
+
       <div className="section-container py-6">
-        {/* Back Button */}
-        <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          className="mb-4"
-        >
-          <Link 
-            to="/" 
-            className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
-          >
-            <ChevronRight className="w-4 h-4 rotate-180" />
-            <span>الصفحة الرئيسية</span>
-          </Link>
-        </motion.div>
-
-        {/* Breadcrumb */}
-        <motion.nav
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          className="flex items-center gap-2 text-sm text-muted-foreground mb-6"
-        >
-          <Link to="/" className="hover:text-primary transition-colors">الرئيسية</Link>
-          <ChevronRight className="w-4 h-4" />
-          <Link to="/cars" className="hover:text-primary transition-colors">السيارات</Link>
-          <ChevronRight className="w-4 h-4" />
-          <span className="text-foreground">{car.nameAr}</span>
-        </motion.nav>
-
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Left: Images */}
           <motion.div
@@ -107,7 +100,7 @@ const CarDetailsPage = () => {
               {car.images && car.images.length > 0 ? (
                 <img
                   src={car.images[selectedImage]}
-                  alt={car.nameAr}
+                  alt={`تأجير ${car.nameAr} في دبي - صورة ${selectedImage + 1}`}
                   className="w-full h-full object-cover"
                 />
               ) : (
@@ -137,7 +130,11 @@ const CarDetailsPage = () => {
                       selectedImage === index ? 'border-primary' : 'border-transparent'
                     }`}
                   >
-                    <img src={image} alt="" className="w-full h-full object-cover" />
+                    <img 
+                      src={image} 
+                      alt={`${car.nameAr} - صورة ${index + 1}`} 
+                      className="w-full h-full object-cover" 
+                    />
                   </button>
                 ))}
               </div>

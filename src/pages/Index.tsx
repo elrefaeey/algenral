@@ -4,15 +4,31 @@ import { motion } from 'framer-motion';
 import { ChevronLeft, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Layout } from '@/components/layout/Layout';
+import { HomeLayout } from '@/components/layout/HomeLayout';
 import { getHomeContent, getAvailableCars } from '@/services/firebaseService';
 import { HomeContent, Car as CarType, defaultHomeContent } from '@/types';
 import { CarCard } from '@/components/cars/CarCard';
+import { useSEO } from '@/hooks/useSEO';
+import { seoContent, getCanonicalUrl } from '@/utils/seoHelpers';
+import { SchemaOrganization } from '@/components/seo/SchemaOrganization';
+import { SchemaLocalBusiness } from '@/components/seo/SchemaLocalBusiness';
+import { SchemaBreadcrumb } from '@/components/seo/SchemaBreadcrumb';
+import { SchemaFAQ } from '@/components/seo/SchemaFAQ';
 import heroBg from '@/assets/hero-bg.jpg';
 
 const Index = () => {
   const [homeContent, setHomeContent] = useState<HomeContent>(defaultHomeContent);
   const [allCars, setAllCars] = useState<CarType[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // SEO Configuration
+  useSEO({
+    title: seoContent.home.title,
+    description: seoContent.home.description,
+    keywords: seoContent.home.keywords,
+    canonical: getCanonicalUrl('/'),
+    ogImage: 'https://algenral.vercel.app/src/assets/logo.png'
+  });
 
   useEffect(() => {
     const fetchData = async () => {
@@ -36,14 +52,20 @@ const Index = () => {
   }, []);
 
   return (
-    <Layout showFooter={true}>
+    <HomeLayout showFooter={true}>
+      {/* SEO Schema Components */}
+      <SchemaOrganization />
+      <SchemaLocalBusiness />
+      <SchemaFAQ />
+      <SchemaBreadcrumb items={[{ name: 'الرئيسية', url: '/' }]} />
+
       {/* Hero Section */}
       <section className="relative min-h-[75vh] sm:min-h-[85vh] flex items-center justify-center overflow-hidden">
         {/* Background */}
         <div className="absolute inset-0">
           <img
             src={homeContent.backgroundUrl || heroBg}
-            alt="Hero background"
+            alt="تأجير سيارات في دبي - AL GENERAL CAR RENTAL"
             className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-background/30" />
@@ -69,14 +91,14 @@ const Index = () => {
               </span>
             </motion.div>
 
-            {/* Title */}
+            {/* Title - SEO Optimized H1 */}
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
               className="text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground leading-tight"
             >
-              {homeContent.mainTitle}
+              تأجير سيارات في دبي
             </motion.h1>
 
             {/* Subtitle */}
@@ -163,7 +185,42 @@ const Index = () => {
           </div>
         </section>
       )}
-    </Layout>
+
+      {/* SEO Content Section */}
+      <section className="py-16 bg-muted/30">
+        <div className="section-container">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="max-w-4xl mx-auto text-center"
+          >
+            <h2 className="text-2xl font-bold text-foreground mb-6">
+              AL GENERAL CAR RENTAL - شركة تأجير السيارات الرائدة في دبي
+            </h2>
+            <div className="prose prose-lg mx-auto text-muted-foreground leading-relaxed">
+              <p className="mb-4">
+                {seoContent.home.intro}
+              </p>
+              <div className="grid md:grid-cols-3 gap-6 mt-8 text-sm">
+                <div className="bg-background/50 p-4 rounded-lg">
+                  <h3 className="font-semibold text-foreground mb-2">خدمات متنوعة</h3>
+                  <p>تأجير يومي، أسبوعي، وشهري لجميع أنواع السيارات</p>
+                </div>
+                <div className="bg-background/50 p-4 rounded-lg">
+                  <h3 className="font-semibold text-foreground mb-2">توصيل مجاني</h3>
+                  <p>خدمة توصيل السيارات للمطار وجميع أنحاء دبي</p>
+                </div>
+                <div className="bg-background/50 p-4 rounded-lg">
+                  <h3 className="font-semibold text-foreground mb-2">خدمة 24/7</h3>
+                  <p>فريق خدمة العملاء متاح على مدار الساعة</p>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+    </HomeLayout>
   );
 };
 

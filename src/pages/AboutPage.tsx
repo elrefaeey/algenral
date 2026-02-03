@@ -2,6 +2,9 @@ import { motion } from 'framer-motion';
 import { Building, Award, Users, Clock, MapPin, Phone, Mail, Shield, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Layout } from '@/components/layout/Layout';
+import { useSEO } from '@/hooks/useSEO';
+import { seoContent, getCanonicalUrl } from '@/utils/seoHelpers';
+import { SchemaBreadcrumb } from '@/components/seo/SchemaBreadcrumb';
 
 const stats = [
   { icon: Users, label: 'عميل سعيد', value: '1000+' },
@@ -11,23 +14,22 @@ const stats = [
 ];
 
 const AboutPage = () => {
+  // SEO Configuration
+  useSEO({
+    title: seoContent.about.title,
+    description: seoContent.about.description,
+    keywords: seoContent.about.keywords,
+    canonical: getCanonicalUrl('/about'),
+    ogImage: 'https://algenral.vercel.app/src/assets/logo.png'
+  });
+
   return (
     <Layout>
-      {/* Back Button */}
-      <div className="section-container pt-6">
-        <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-        >
-          <Link 
-            to="/" 
-            className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
-          >
-            <ChevronRight className="w-4 h-4 rotate-180" />
-            <span>الصفحة الرئيسية</span>
-          </Link>
-        </motion.div>
-      </div>
+      {/* SEO Schema Components */}
+      <SchemaBreadcrumb items={[
+        { name: 'الرئيسية', url: '/' },
+        { name: 'من نحن', url: '/about' }
+      ]} />
 
       {/* Hero */}
       <section className="bg-muted/50 py-16">

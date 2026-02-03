@@ -3,25 +3,27 @@ import { MapPin, Phone, MessageCircle, Clock, ChevronRight } from 'lucide-react'
 import { Link } from 'react-router-dom';
 import { Layout } from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
+import { useSEO } from '@/hooks/useSEO';
+import { seoContent, getCanonicalUrl } from '@/utils/seoHelpers';
+import { SchemaBreadcrumb } from '@/components/seo/SchemaBreadcrumb';
 
 const ContactPage = () => {
+  // SEO Configuration
+  useSEO({
+    title: seoContent.contact.title,
+    description: seoContent.contact.description,
+    keywords: seoContent.contact.keywords,
+    canonical: getCanonicalUrl('/contact'),
+    ogImage: 'https://algenral.vercel.app/src/assets/logo.png'
+  });
+
   return (
     <Layout>
-      {/* Back Button */}
-      <div className="section-container pt-6">
-        <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-        >
-          <Link 
-            to="/" 
-            className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors"
-          >
-            <ChevronRight className="w-4 h-4 rotate-180" />
-            <span>الصفحة الرئيسية</span>
-          </Link>
-        </motion.div>
-      </div>
+      {/* SEO Schema Components */}
+      <SchemaBreadcrumb items={[
+        { name: 'الرئيسية', url: '/' },
+        { name: 'تواصل معنا', url: '/contact' }
+      ]} />
 
       {/* Hero */}
       <section className="bg-muted/50 py-16">
@@ -31,9 +33,9 @@ const ContactPage = () => {
             animate={{ opacity: 1, y: 0 }}
             className="text-center max-w-2xl mx-auto"
           >
-            <h1 className="text-4xl font-bold text-foreground mb-4">معلومات التواصل</h1>
+            <h1 className="text-4xl font-bold text-foreground mb-4">تواصل معنا</h1>
             <p className="text-lg text-muted-foreground">
-              نحن هنا لمساعدتك. تواصل معنا في أي وقت
+              نخدم عملاءنا في جميع أنحاء دبي والإمارات العربية المتحدة على مدار الساعة
             </p>
           </motion.div>
         </div>

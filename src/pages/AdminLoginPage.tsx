@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/contexts/AuthContext';
+import { useSEO } from '@/hooks/useSEO';
 import { toast } from 'sonner';
 
 const loginSchema = z.object({
@@ -23,6 +24,13 @@ const AdminLoginPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
+
+  // Block from search engines
+  useSEO({
+    title: 'Admin Login - AL GENERAL CAR RENTAL',
+    description: 'Admin access only',
+    noindex: true
+  });
 
   const {
     register,
