@@ -13,7 +13,7 @@ export const Header = () => {
   const location = useLocation();
 
   return (
-    <header className="absolute top-0 right-0 left-0 z-50">
+    <header className="fixed top-0 right-0 left-0 z-50 bg-white shadow-md">
       <div className="section-container">
         {/* Desktop Layout */}
         <div className="hidden md:block">
@@ -30,8 +30,8 @@ export const Header = () => {
             </Link>
           </div>
           
-          {/* Navigation Section - Better Transparency */}
-          <div className="flex items-center justify-center py-3 bg-white/80 backdrop-blur-lg border-t border-white/20">
+          {/* Navigation Section - White Background */}
+          <div className="flex items-center justify-center py-3 bg-white border-t border-gray-100">
             <nav className="flex items-center gap-2">
               {navLinks.map((link) => (
                 <Link
@@ -68,8 +68,8 @@ export const Header = () => {
             </Link>
           </div>
           
-          {/* Mobile Navigation - Better Transparency */}
-          <div className="flex items-center justify-center py-2 bg-white/80 backdrop-blur-lg border-t border-white/20">
+          {/* Mobile Navigation - White Background */}
+          <div className="flex items-center justify-center py-2 bg-white border-t border-gray-100">
             <nav className="flex items-center gap-1">
               {navLinks.map((link) => (
                 <Link

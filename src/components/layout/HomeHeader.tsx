@@ -12,12 +12,12 @@ export const HomeHeader = () => {
   const location = useLocation();
 
   return (
-    <header className="fixed top-0 right-0 left-0 z-[9999]">
+    <header className="fixed top-0 right-0 left-0 z-[9999] bg-white shadow-md">
       <div className="section-container">
         {/* Desktop Layout */}
         <div className="hidden md:block">
           {/* Logo Section */}
-          <div className="flex justify-center py-4 border-b border-gray-100/50">
+          <div className="flex justify-center py-4 border-b border-gray-100">
             <Link to="/" className="hover:opacity-90 transition-all duration-300 hover:scale-105">
               <div className="logo-container h-16 w-auto min-w-[200px] max-w-[280px] drop-shadow-sm">
                 <img
@@ -30,7 +30,7 @@ export const HomeHeader = () => {
           </div>
           
           {/* Navigation Section */}
-          <div className="flex items-center justify-center py-3">
+          <div className="flex items-center justify-center py-3 bg-white">
             <nav className="flex items-center gap-2">
               {navLinks.map((link) => (
                 <Link
@@ -55,7 +55,7 @@ export const HomeHeader = () => {
         {/* Mobile Layout */}
         <div className="md:hidden">
           {/* Mobile Logo */}
-          <div className="flex justify-center py-3 border-b border-gray-100/50">
+          <div className="flex justify-center py-3 border-b border-gray-100">
             <Link to="/" className="hover:opacity-90 transition-all duration-300">
               <div className="logo-container h-12 w-auto min-w-[140px] max-w-[180px] drop-shadow-sm">
                 <img
@@ -68,7 +68,7 @@ export const HomeHeader = () => {
           </div>
           
           {/* Mobile Navigation */}
-          <div className="flex items-center justify-center py-2">
+          <div className="flex items-center justify-center py-2 bg-white">
             <nav className="flex items-center gap-1">
               {navLinks.map((link) => (
                 <Link
