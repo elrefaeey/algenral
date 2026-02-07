@@ -62,6 +62,7 @@ const initialCarState: Omit<Car, 'id' | 'createdAt' | 'updatedAt'> = {
   available: true,
   category: '',
   year: new Date().getFullYear(),
+  order: 999,
 };
 
 export const AdminCars = ({ cars, onRefresh, loading }: AdminCarsProps) => {
@@ -91,6 +92,7 @@ export const AdminCars = ({ cars, onRefresh, loading }: AdminCarsProps) => {
         available: car.available,
         category: car.category || '',
         year: car.year,
+        order: car.order ?? 999,
       });
     } else {
       setSelectedCar(null);
@@ -229,10 +231,16 @@ export const AdminCars = ({ cars, onRefresh, loading }: AdminCarsProps) => {
                   )}
                 </div>
 
-                {/* Info */}
                 <div className="flex-1 min-w-0">
                   <h3 className="font-semibold text-sm sm:text-base text-foreground truncate">{car.nameAr}</h3>
-                  <p className="text-xs sm:text-sm text-muted-foreground truncate">{car.name}</p>
+                  <div className="flex items-center gap-2">
+                    <p className="text-xs sm:text-sm text-muted-foreground truncate">{car.name}</p>
+                    {car.order !== undefined && (
+                      <span className="text-[10px] bg-primary/10 text-primary px-1.5 py-0.5 rounded">
+                        ترتيب: {car.order}
+                      </span>
+                    )}
+                  </div>
                   <p className="text-xs sm:text-sm text-primary font-medium">{car.priceDaily} د.إ / يوم</p>
                 </div>
 
@@ -406,6 +414,15 @@ export const AdminCars = ({ cars, onRefresh, loading }: AdminCarsProps) => {
                   type="number"
                   value={formData.year}
                   onChange={(e) => setFormData({ ...formData, year: +e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>ترتيب الظهور (رقم أصغر يظهر أولاً)</Label>
+                <Input
+                  type="number"
+                  value={formData.order}
+                  onChange={(e) => setFormData({ ...formData, order: +e.target.value })}
+                  placeholder="مثلاً 1 للظهور في الأول"
                 />
               </div>
             </div>

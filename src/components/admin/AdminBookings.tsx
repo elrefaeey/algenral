@@ -11,6 +11,7 @@ import {
   User,
   Phone,
   Clock,
+  Trash2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -21,6 +22,16 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -28,7 +39,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Booking, Car } from '@/types';
-import { updateBooking, updateCar } from '@/services/firebaseService';
+import { updateBooking, updateCar, deleteBooking } from '@/services/firebaseService';
 import { toast } from 'sonner';
 
 interface AdminBookingsProps {
@@ -55,6 +66,8 @@ const statusColors = {
 export const AdminBookings = ({ bookings, cars, onRefresh, loading }: AdminBookingsProps) => {
   const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [bookingToDelete, setBookingToDelete] = useState<Booking | null>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [statusFilter, setStatusFilter] = useState<string>('all');
 
   const filteredBookings = statusFilter === 'all'
@@ -86,6 +99,22 @@ export const AdminBookings = ({ bookings, cars, onRefresh, loading }: AdminBooki
     } catch (error) {
       console.error('Status update error:', error);
       toast.error('فشل تحديث الحالة');
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!bookingToDelete) return;
+
+    try {
+      await deleteBooking(bookingToDelete.id);
+      toast.success('تم حذف الحجز بنجاح');
+      onRefresh();
+    } catch (error) {
+      console.error('Delete error:', error);
+      toast.error('فشل حذف الحجز');
+    } finally {
+      setIsDeleteDialogOpen(false);
+      setBookingToDelete(null);
     }
   };
 
@@ -210,6 +239,16 @@ export const AdminBookings = ({ bookings, cars, onRefresh, loading }: AdminBooki
                       إكمال
                     </Button>
                   )}
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => {
+                      setBookingToDelete(booking);
+                      setIsDeleteDialogOpen(true);
+                    }}
+                  >
+                    <Trash2 className="w-4 h-4 text-destructive" />
+                  </Button>
                 </div>
               </div>
             </div>
@@ -308,6 +347,27 @@ export const AdminBookings = ({ bookings, cars, onRefresh, loading }: AdminBooki
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Delete Confirmation */}
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>تأكيد الحذف</AlertDialogTitle>
+            <AlertDialogDescription>
+              هل أنت متأكد من حذف الحجز رقم "{bookingToDelete?.bookingNumber}"؟ سيتم حذف جميع بيانات هذا الحجز نهائياً من النظام.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>إلغاء</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              className="bg-destructive hover:bg-destructive/90"
+            >
+              حذف
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </motion.div>
   );
 };

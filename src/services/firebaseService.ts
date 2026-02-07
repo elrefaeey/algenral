@@ -25,14 +25,20 @@ import { Car, Booking, HomeContent, SiteSettings, defaultHomeContent, defaultSit
 export const getCars = async (): Promise<Car[]> => {
   try {
     const carsRef = collection(db, 'cars');
-    const q = query(carsRef, orderBy('createdAt', 'desc'));
-    const snapshot = await getDocs(q);
-    return snapshot.docs.map(doc => ({
+    const snapshot = await getDocs(carsRef);
+    const cars = snapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data(),
       createdAt: doc.data().createdAt?.toDate(),
       updatedAt: doc.data().updatedAt?.toDate(),
     })) as Car[];
+    
+    return cars.sort((a, b) => {
+      const orderA = a.order ?? 999;
+      const orderB = b.order ?? 999;
+      if (orderA !== orderB) return orderA - orderB;
+      return (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0);
+    });
   } catch (error) {
     console.warn('Failed to fetch cars:', error);
     return [];
@@ -51,8 +57,13 @@ export const getAvailableCars = async (): Promise<Car[]> => {
       updatedAt: doc.data().updatedAt?.toDate(),
     })) as Car[];
     
-    // Sort in memory instead of using orderBy to avoid index requirement
-    return cars.sort((a, b) => (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0));
+    // Sort by order then by date
+    return cars.sort((a, b) => {
+      const orderA = a.order ?? 999;
+      const orderB = b.order ?? 999;
+      if (orderA !== orderB) return orderA - orderB;
+      return (b.createdAt?.getTime() || 0) - (a.createdAt?.getTime() || 0);
+    });
   } catch (error) {
     console.warn('Failed to fetch available cars:', error);
     return [];
@@ -206,6 +217,11 @@ export const updateBooking = async (id: string, booking: Partial<Booking>): Prom
   }
   
   await updateDoc(bookingRef, updateData);
+};
+
+export const deleteBooking = async (id: string): Promise<void> => {
+  const bookingRef = doc(db, 'bookings', id);
+  await deleteDoc(bookingRef);
 };
 
 // Home Content

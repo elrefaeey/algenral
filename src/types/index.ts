@@ -14,6 +14,7 @@ export interface Car {
   available: boolean;
   category: string;
   year: number;
+  order?: number;
   createdAt: Date;
   updatedAt: Date;
 }

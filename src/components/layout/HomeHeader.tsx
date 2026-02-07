@@ -12,7 +12,7 @@ export const HomeHeader = () => {
   const location = useLocation();
 
   return (
-    <header className="absolute top-0 right-0 left-0 z-[9999] bg-white shadow-md">
+    <header className="fixed top-0 right-0 left-0 z-[9999]">
       <div className="section-container">
         {/* Desktop Layout */}
         <div className="hidden md:block">

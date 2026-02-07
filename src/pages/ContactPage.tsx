@@ -160,6 +160,27 @@ const ContactPage = () => {
           </div>
         </div>
       </section>
+
+      {/* Map Section */}
+      <section className="py-16">
+        <div className="section-container">
+          <h2 className="text-2xl font-bold text-foreground mb-6 text-center">
+            موقعنا على الخريطة
+          </h2>
+          <div className="aspect-w-16 aspect-h-9">
+            <iframe
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3607.6693852175417!2d55.35154797538452!3d25.28170487765671!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3e5f5d9eb53dae23%3A0xb67c5e75a9851be1!2sDar%20Al%20Nahda%20Building%20%23%2041!5e0!3m2!1sen!2seg!4v1770480581306!5m2!1sen!2seg"
+              width="100%"
+              height="450"
+              style={{ border: 0 }}
+              allowFullScreen
+              loading="lazy"
+              title="Google Maps"
+              referrerPolicy="no-referrer-when-downgrade"
+            ></iframe>
+          </div>
+        </div>
+      </section>
     </Layout>
   );
 };
