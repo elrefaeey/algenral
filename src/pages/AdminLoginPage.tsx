@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { motion } from 'framer-motion';
-import { Lock, Mail, Eye, EyeOff, Loader2, Car } from 'lucide-react';
+import { Lock, Mail, Eye, EyeOff, Loader2, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -25,11 +25,10 @@ const AdminLoginPage = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  // Block from search engines
   useSEO({
     title: 'Admin Login - AL GENERAL CAR RENTAL',
     description: 'Admin access only',
-    noindex: true
+    noindex: true,
   });
 
   const {
@@ -47,9 +46,10 @@ const AdminLoginPage = () => {
       toast.success('تم تسجيل الدخول بنجاح');
       navigate('/admin');
     } catch (error: any) {
-      const errorMessage = error.code === 'auth/invalid-credential'
-        ? 'البريد الإلكتروني أو كلمة المرور غير صحيحة'
-        : 'حدث خطأ. يرجى المحاولة مرة أخرى';
+      const errorMessage =
+        error.code === 'auth/invalid-credential'
+          ? 'البريد الإلكتروني أو كلمة المرور غير صحيحة'
+          : 'حدث خطأ. يرجى المحاولة مرة أخرى';
       toast.error(errorMessage);
     } finally {
       setIsLoading(false);
@@ -57,20 +57,28 @@ const AdminLoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-muted/50 flex items-center justify-center p-4">
+    <div className="min-h-screen relative flex items-center justify-center p-4 overflow-hidden">
+      <div className="absolute inset-0 bg-ink" />
+      <div
+        className="absolute inset-0 opacity-60"
+        style={{
+          background:
+            'radial-gradient(ellipse 70% 50% at 80% 20%, hsl(36 42% 46% / 0.25), transparent), radial-gradient(ellipse 50% 40% at 10% 90%, hsl(36 42% 46% / 0.1), transparent)',
+        }}
+      />
+
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 24 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-md"
+        transition={{ duration: 0.6 }}
+        className="relative w-full max-w-md"
       >
-        <div className="bg-card rounded-xl border border-border p-8 shadow-soft">
-          {/* Logo */}
+        <div className="rounded-md border border-white/10 bg-background/95 backdrop-blur-md p-8 shadow-medium">
           <div className="text-center mb-8">
-            <div className="w-16 h-16 mx-auto mb-4 rounded-xl bg-primary flex items-center justify-center">
-              <Car className="w-8 h-8 text-primary-foreground" />
-            </div>
-            <h1 className="text-2xl font-bold text-foreground">لوحة الإدارة</h1>
-            <p className="text-muted-foreground mt-1">الچينرال لتأجير السيارات</p>
+            <p className="font-display text-4xl tracking-[0.16em] text-foreground">AL GENERAL</p>
+            <div className="luxury-divider my-4 w-14" />
+            <h1 className="text-xl font-bold text-foreground">لوحة الإدارة</h1>
+            <p className="text-muted-foreground mt-1 text-sm">الچينرال لتأجير السيارات</p>
           </div>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
@@ -82,7 +90,7 @@ const AdminLoginPage = () => {
                   id="email"
                   type="email"
                   placeholder="admin@example.com"
-                  className="pr-10"
+                  className="pr-10 rounded-md"
                   {...register('email')}
                 />
               </div>
@@ -99,7 +107,7 @@ const AdminLoginPage = () => {
                   id="password"
                   type={showPassword ? 'text' : 'password'}
                   placeholder="••••••••"
-                  className="pr-10 pl-10"
+                  className="pr-10 pl-10 rounded-md"
                   {...register('password')}
                 />
                 <button
@@ -115,7 +123,7 @@ const AdminLoginPage = () => {
               )}
             </div>
 
-            <Button type="submit" className="w-full btn-gold" disabled={isLoading}>
+            <Button type="submit" className="w-full btn-gold rounded-md py-5" disabled={isLoading}>
               {isLoading ? (
                 <>
                   <Loader2 className="ml-2 h-5 w-5 animate-spin" />
@@ -127,9 +135,18 @@ const AdminLoginPage = () => {
             </Button>
           </form>
 
-          <p className="text-center text-sm text-muted-foreground mt-6">
-            للحصول على بيانات الدخول، تواصل مع المسؤول
-          </p>
+          <div className="mt-6 pt-5 border-t border-border/60 text-center space-y-3">
+            <p className="text-sm text-muted-foreground">
+              للحصول على بيانات الدخول، تواصل مع المسؤول
+            </p>
+            <Link
+              to="/"
+              className="inline-flex items-center gap-1.5 text-sm text-primary hover:text-gold-dark transition-colors"
+            >
+              <ArrowRight className="w-4 h-4" />
+              العودة للموقع
+            </Link>
+          </div>
         </div>
       </motion.div>
     </div>

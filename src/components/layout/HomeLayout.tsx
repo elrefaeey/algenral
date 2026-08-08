@@ -8,7 +8,7 @@ interface HomeLayoutProps {
   showFooter?: boolean;
 }
 
-export const HomeLayout = ({ children, showFooter = false }: HomeLayoutProps) => {
+export const HomeLayout = ({ children, showFooter = true }: HomeLayoutProps) => {
   return (
     <div className="min-h-screen flex flex-col">
       <HomeHeader />

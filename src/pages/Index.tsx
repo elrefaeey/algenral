@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { ChevronLeft, Star } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Layout } from '@/components/layout/Layout';
 import { HomeLayout } from '@/components/layout/HomeLayout';
 import { getHomeContent, getAvailableCars } from '@/services/firebaseService';
 import { HomeContent, Car as CarType, defaultHomeContent } from '@/types';
@@ -14,20 +13,33 @@ import { SchemaOrganization } from '@/components/seo/SchemaOrganization';
 import { SchemaLocalBusiness } from '@/components/seo/SchemaLocalBusiness';
 import { SchemaBreadcrumb } from '@/components/seo/SchemaBreadcrumb';
 import { SchemaFAQ } from '@/components/seo/SchemaFAQ';
-import heroBg from '@/assets/hero-bg.jpg';
+import { useLanguage } from '@/contexts/LanguageContext';
+import hero1 from '@/assets/hero-1.jpg';
+import hero2 from '@/assets/hero-2.jpg';
+import hero3 from '@/assets/hero-3.jpg';
+
+const HERO_SLIDES = [hero1, hero2, hero3];
+const HERO_INTERVAL_MS = 3000;
 
 const Index = () => {
   const [homeContent, setHomeContent] = useState<HomeContent>(defaultHomeContent);
   const [allCars, setAllCars] = useState<CarType[]>([]);
   const [loading, setLoading] = useState(true);
+  const [heroIndex, setHeroIndex] = useState(0);
+  const { t, lang, isRTL } = useLanguage();
 
-  // SEO Configuration
   useSEO({
-    title: seoContent.home.title,
-    description: seoContent.home.description,
+    title:
+      lang === 'ar'
+        ? seoContent.home.title
+        : 'Luxury Car Rental in Dubai | AL GENERAL CAR RENTAL',
+    description:
+      lang === 'ar'
+        ? seoContent.home.description
+        : 'AL GENERAL luxury car rental in Dubai. Daily, weekly, and monthly hire with airport delivery and 24/7 support.',
     keywords: seoContent.home.keywords,
     canonical: getCanonicalUrl('/'),
-    ogImage: 'https://algenral.vercel.app/src/assets/logo.png'
+    ogImage: 'https://algenral.vercel.app/logo.png',
   });
 
   useEffect(() => {
@@ -38,10 +50,9 @@ const Index = () => {
           getAvailableCars().catch(() => []),
         ]);
         setHomeContent(content);
-        setAllCars(cars); // عرض جميع السيارات بدلاً من 3 فقط
+        setAllCars(cars);
       } catch (error) {
         console.error('Error fetching home data:', error);
-        // Use default content if there's an error
         setHomeContent(defaultHomeContent);
         setAllCars([]);
       } finally {
@@ -51,78 +62,108 @@ const Index = () => {
     fetchData();
   }, []);
 
+  const useVideo =
+    homeContent.backgroundType === 'video' && Boolean(homeContent.backgroundUrl);
+
+  useEffect(() => {
+    if (useVideo) return;
+    const id = window.setInterval(() => {
+      setHeroIndex((prev) => (prev + 1) % HERO_SLIDES.length);
+    }, HERO_INTERVAL_MS);
+    return () => window.clearInterval(id);
+  }, [useVideo]);
+
+  const subtitle =
+    lang === 'ar'
+      ? homeContent.subtitle || t.home.fallbackSubtitle
+      : t.home.fallbackSubtitle;
+  const ctaText =
+    lang === 'ar' ? homeContent.ctaButtonText || t.home.ctaDefault : t.home.ctaDefault;
+  const waText =
+    lang === 'ar' ? homeContent.whatsappButtonText || t.home.waDefault : t.home.waDefault;
+  const Chevron = isRTL ? ChevronLeft : ChevronRight;
+
   return (
     <HomeLayout showFooter={true}>
-      {/* SEO Schema Components */}
       <SchemaOrganization />
       <SchemaLocalBusiness />
       <SchemaFAQ />
-      <SchemaBreadcrumb items={[{ name: 'الرئيسية', url: '/' }]} />
+      <SchemaBreadcrumb items={[{ name: t.nav.home, url: '/' }]} />
 
-      {/* Hero Section */}
-      <section className="relative min-h-[75vh] sm:min-h-[85vh] flex items-center justify-center overflow-hidden">
-        {/* Background */}
+      <section className="relative min-h-[100svh] flex items-end md:items-center overflow-hidden">
         <div className="absolute inset-0">
-          <img
-            src={homeContent.backgroundUrl || heroBg}
-            alt="تأجير سيارات في دبي - AL GENERAL CAR RENTAL"
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-background/30" />
+          {useVideo ? (
+            <video
+              src={homeContent.backgroundUrl}
+              className="w-full h-full object-cover"
+              autoPlay
+              muted
+              loop
+              playsInline
+            />
+          ) : (
+            <AnimatePresence mode="sync">
+              <motion.img
+                key={heroIndex}
+                src={HERO_SLIDES[heroIndex]}
+                alt={t.home.headline}
+                className="absolute inset-0 w-full h-full object-cover object-center"
+                initial={{ opacity: 0, scale: 1.04 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1] }}
+              />
+            </AnimatePresence>
+          )}
+          {/* Lighter overlays — keep text readable without heavy fog */}
+          <div className="absolute inset-0 bg-gradient-to-t from-ink/85 via-ink/25 to-ink/30" />
+          <div className="absolute inset-0 bg-gradient-to-l from-transparent via-transparent to-ink/45" />
         </div>
 
-        {/* Content */}
-        <div className="relative z-10 section-container text-center pt-44 pb-20 md:py-20">
+        <div className="relative z-10 section-container w-full pt-28 pb-16 md:py-28">
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 36 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="space-y-6 max-w-3xl mx-auto"
+            transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+            className="relative max-w-2xl space-y-6 md:space-y-8"
           >
-            {/* Badge */}
+            <div
+              className="pointer-events-none absolute -inset-4 sm:-inset-8 -z-10 rounded-2xl"
+              style={{
+                background:
+                  'radial-gradient(ellipse at center, hsl(210 28% 8% / 0.45), transparent 70%)',
+              }}
+            />
+            <div className="space-y-3">
+              <p className="font-display text-white text-4xl sm:text-5xl md:text-6xl lg:text-7xl tracking-[0.16em] leading-none drop-shadow-[0_2px_14px_rgba(0,0,0,0.65)]">
+                AL GENERAL
+              </p>
+              <p className="text-primary text-sm sm:text-base font-medium tracking-[0.28em] drop-shadow-[0_1px_8px_rgba(0,0,0,0.7)]">
+                {t.brand.tagline}
+              </p>
+            </div>
+
+            <div className="luxury-divider mx-0 w-20 bg-gradient-to-l from-transparent via-primary to-primary" />
+
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white leading-snug text-balance drop-shadow-[0_2px_12px_rgba(0,0,0,0.6)]">
+              {t.home.headline}
+            </h1>
+
+            <p className="text-base sm:text-lg text-white/90 max-w-xl leading-relaxed drop-shadow-[0_1px_8px_rgba(0,0,0,0.55)]">
+              {subtitle}
+            </p>
+
             <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.2 }}
-            >
-              <span className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full text-sm font-medium">
-                <Star className="w-4 h-4 fill-primary" />
-                أفضل خدمة تأجير سيارات في دبي
-              </span>
-            </motion.div>
-
-            {/* Title - SEO Optimized H1 */}
-            <motion.h1
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className="text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground leading-tight"
-            >
-              تأجير سيارات في دبي
-            </motion.h1>
-
-            {/* Subtitle */}
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
-              className="text-lg sm:text-xl text-muted-foreground max-w-xl mx-auto"
-            >
-              {homeContent.subtitle}
-            </motion.p>
-
-            {/* CTAs */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 }}
-              className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4"
+              transition={{ delay: 0.35, duration: 0.7 }}
+              className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2"
             >
               {homeContent.showCta && (
-                <Button asChild size="lg" className="btn-gold px-8 py-6 text-lg">
+                <Button asChild size="lg" className="btn-gold px-8 py-6 text-base rounded-md">
                   <Link to="/cars">
-                    {homeContent.ctaButtonText}
-                    <ChevronLeft className="mr-2 w-5 h-5" />
+                    {ctaText}
+                    <Chevron className="ms-2 w-5 h-5" />
                   </Link>
                 </Button>
               )}
@@ -130,15 +171,14 @@ const Index = () => {
                 <Button
                   asChild
                   size="lg"
-                  variant="outline"
-                  className="btn-outline-gold px-8 py-6 text-lg"
+                  className="bg-white text-ink hover:bg-white/90 px-8 py-6 text-base rounded-md font-semibold border-0"
                 >
                   <a
                     href="https://wa.me/971555900747"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    {homeContent.whatsappButtonText}
+                    {waText}
                   </a>
                 </Button>
               )}
@@ -146,76 +186,97 @@ const Index = () => {
           </motion.div>
         </div>
 
-        {/* Scroll Indicator */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1 }}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2"
-        >
-          <div className="w-6 h-10 border-2 border-foreground/20 rounded-full flex justify-center pt-2">
-            <motion.div
-              animate={{ y: [0, 8, 0] }}
-              transition={{ repeat: Infinity, duration: 1.5 }}
-              className="w-1.5 h-1.5 bg-primary rounded-full"
-            />
+        {!useVideo && (
+          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex items-center gap-2">
+            {HERO_SLIDES.map((_, i) => (
+              <button
+                key={i}
+                type="button"
+                aria-label={`Slide ${i + 1}`}
+                onClick={() => setHeroIndex(i)}
+                className={`h-1.5 rounded-full transition-all duration-500 ${
+                  i === heroIndex ? 'w-8 bg-primary' : 'w-2.5 bg-white/45 hover:bg-white/70'
+                }`}
+              />
+            ))}
           </div>
-        </motion.div>
+        )}
       </section>
 
-      {/* All Cars */}
-      {allCars.length > 0 && (
-        <section className="py-20">
-          <div className="section-container">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="text-center mb-10"
-            >
-              <h2 className="text-3xl font-bold text-foreground mb-2">سياراتنا المتاحة</h2>
-              <p className="text-muted-foreground">اختر من مجموعة واسعة من السيارات المتاحة للحجز</p>
-            </motion.div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
-              {allCars.map((car, index) => (
-                <CarCard key={car.id} car={car} index={index} />
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* SEO Content Section */}
-      <section className="py-16 bg-muted/30">
+      <section className="py-20 md:py-24">
         <div className="section-container">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="max-w-4xl mx-auto text-center"
+            className="mb-12 md:mb-14 max-w-2xl"
           >
-            <h2 className="text-2xl font-bold text-foreground mb-6">
-              AL GENERAL CAR RENTAL - شركة تأجير السيارات الرائدة في دبي
+            <p className="section-eyebrow mb-3">{t.home.fleetEyebrow}</p>
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-3">
+              {t.home.fleetTitle}
             </h2>
-            <div className="prose prose-lg mx-auto text-muted-foreground leading-relaxed">
-              <p className="mb-4">
-                {seoContent.home.intro}
-              </p>
-              <div className="grid md:grid-cols-3 gap-6 mt-8 text-sm">
-                <div className="bg-background/50 p-4 rounded-lg">
-                  <h3 className="font-semibold text-foreground mb-2">خدمات متنوعة</h3>
-                  <p>تأجير يومي، أسبوعي، وشهري لجميع أنواع السيارات</p>
+            <p className="text-muted-foreground text-lg">{t.home.fleetDesc}</p>
+          </motion.div>
+
+          {loading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[...Array(3)].map((_, i) => (
+                <div key={i} className="aspect-[4/5] bg-muted animate-pulse rounded-md" />
+              ))}
+            </div>
+          ) : allCars.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-7">
+              {allCars.map((car, index) => (
+                <CarCard key={car.id} car={car} index={index} />
+              ))}
+            </div>
+          ) : (
+            <p className="text-muted-foreground text-center py-12">{t.home.noCars}</p>
+          )}
+
+          {allCars.length > 0 && (
+            <div className="mt-12 text-center">
+              <Button asChild variant="outline" className="btn-outline-gold rounded-md px-8">
+                <Link to="/cars">{t.home.viewFleet}</Link>
+              </Button>
+            </div>
+          )}
+        </div>
+      </section>
+
+      <section className="py-20 md:py-24 relative overflow-hidden">
+        <div className="absolute inset-0 bg-ink" />
+        <div
+          className="absolute inset-0 opacity-50"
+          style={{
+            background:
+              'radial-gradient(ellipse 70% 80% at 10% 50%, hsl(36 42% 46% / 0.2), transparent)',
+          }}
+        />
+        <div className="section-container relative">
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="max-w-3xl mx-auto text-center space-y-6"
+          >
+            <p className="section-eyebrow text-primary">{t.home.experienceEyebrow}</p>
+            <h2 className="text-3xl md:text-4xl font-bold text-white text-balance">
+              {t.home.experienceTitle}
+            </h2>
+            <p className="text-white/65 text-lg leading-relaxed">{t.home.experienceIntro}</p>
+            <div className="grid sm:grid-cols-3 gap-8 pt-8 text-start sm:text-center">
+              {[
+                { title: t.home.feature1Title, desc: t.home.feature1Desc },
+                { title: t.home.feature2Title, desc: t.home.feature2Desc },
+                { title: t.home.feature3Title, desc: t.home.feature3Desc },
+              ].map((item) => (
+                <div key={item.title} className="space-y-2">
+                  <div className="luxury-divider sm:mx-auto w-10" />
+                  <h3 className="font-semibold text-white text-lg">{item.title}</h3>
+                  <p className="text-sm text-white/55 leading-relaxed">{item.desc}</p>
                 </div>
-                <div className="bg-background/50 p-4 rounded-lg">
-                  <h3 className="font-semibold text-foreground mb-2">توصيل مجاني</h3>
-                  <p>خدمة توصيل السيارات للمطار وجميع أنحاء دبي</p>
-                </div>
-                <div className="bg-background/50 p-4 rounded-lg">
-                  <h3 className="font-semibold text-foreground mb-2">خدمة 24/7</h3>
-                  <p>فريق خدمة العملاء متاح على مدار الساعة</p>
-                </div>
-              </div>
+              ))}
             </div>
           </motion.div>
         </div>

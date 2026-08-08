@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { format, differenceInDays } from 'date-fns';
 import { ar } from 'date-fns/locale';
-import { Calendar, Clock, User, Phone, Mail, FileText, Loader2, AlertCircle } from 'lucide-react';
+import { Calendar, User, Phone, Mail, FileText, Loader2, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -17,17 +17,16 @@ import { Car, Booking } from '@/types';
 import { addBooking, checkDateAvailability } from '@/services/firebaseService';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { useLanguage } from '@/contexts/LanguageContext';
 
-const bookingSchema = z.object({
-  customerName: z.string().min(2, 'الاسم مطلوب'),
-  customerPhone: z.string().min(9, 'رقم الهاتف غير صحيح'),
-  customerEmail: z.string().email('البريد الإلكتروني غير صحيح').optional().or(z.literal('')),
-  pickupTime: z.string().min(1, 'وقت الاستلام مطلوب'),
-  dropoffTime: z.string().min(1, 'وقت التسليم مطلوب'),
-  notes: z.string().optional().or(z.literal('')),
-});
-
-type BookingFormData = z.infer<typeof bookingSchema>;
+type BookingFormData = {
+  customerName: string;
+  customerPhone: string;
+  customerEmail?: string;
+  pickupTime: string;
+  dropoffTime: string;
+  notes?: string;
+};
 
 interface BookingFormProps {
   car: Car;
@@ -40,37 +39,42 @@ const timeSlots = [
 ];
 
 export const BookingForm = ({ car }: BookingFormProps) => {
+  const { t, lang } = useLanguage();
   const [pickupDate, setPickupDate] = useState<Date>();
   const [dropoffDate, setDropoffDate] = useState<Date>();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [dateError, setDateError] = useState<string | null>(null);
   const [totalDays, setTotalDays] = useState(0);
-  const [pricePerDay, setPricePerDay] = useState(0);
-  const [totalPrice, setTotalPrice] = useState(0);
+
+  const bookingSchema = z.object({
+    customerName: z.string().min(2, lang === 'ar' ? 'الاسم مطلوب' : 'Name is required'),
+    customerPhone: z.string().min(9, lang === 'ar' ? 'رقم الهاتف غير صحيح' : 'Invalid phone number'),
+    customerEmail: z
+      .string()
+      .email(lang === 'ar' ? 'البريد الإلكتروني غير صحيح' : 'Invalid email')
+      .optional()
+      .or(z.literal('')),
+    pickupTime: z.string().min(1, lang === 'ar' ? 'وقت الاستلام مطلوب' : 'Pickup time is required'),
+    dropoffTime: z.string().min(1, lang === 'ar' ? 'وقت التسليم مطلوب' : 'Drop-off time is required'),
+    notes: z.string().optional().or(z.literal('')),
+  });
 
   const {
     register,
     handleSubmit,
     formState: { errors },
     setValue,
-    watch,
   } = useForm<BookingFormData>({
     resolver: zodResolver(bookingSchema),
   });
 
-  // Calculate pricing
   useEffect(() => {
     if (pickupDate && dropoffDate) {
-      const days = differenceInDays(dropoffDate, pickupDate) + 1;
-      setTotalDays(days);
-      setPricePerDay(car.priceDaily);
-      setTotalPrice(car.priceDaily * days);
+      setTotalDays(differenceInDays(dropoffDate, pickupDate) + 1);
     } else {
       setTotalDays(0);
-      setPricePerDay(0);
-      setTotalPrice(0);
     }
-  }, [pickupDate, dropoffDate, car]);
+  }, [pickupDate, dropoffDate]);
 
   // Check availability when dates change
   useEffect(() => {
@@ -79,16 +83,16 @@ export const BookingForm = ({ car }: BookingFormProps) => {
         setDateError(null);
         const isAvailable = await checkDateAvailability(car.id, pickupDate, dropoffDate);
         if (!isAvailable) {
-          setDateError('هذه السيارة غير متاحة في التاريخ المختار');
+          setDateError(t.booking.unavailableDates);
         }
       }
     };
     checkAvailability();
-  }, [pickupDate, dropoffDate, car.id]);
+  }, [pickupDate, dropoffDate, car.id, t.booking.unavailableDates]);
 
   const onSubmit = async (data: BookingFormData) => {
     if (!pickupDate || !dropoffDate) {
-      toast.error('يرجى تحديد تاريخ الاستلام والتسليم');
+      toast.error(lang === 'ar' ? 'يرجى تحديد تاريخ الاستلام والتسليم' : 'Please select pickup and drop-off dates');
       return;
     }
 
@@ -111,20 +115,18 @@ export const BookingForm = ({ car }: BookingFormProps) => {
         dropoffDate,
         dropoffTime: data.dropoffTime,
         totalDays,
-        pricePerDay,
-        totalPrice,
+        pricePerDay: 0,
+        totalPrice: 0,
         notes: data.notes || '',
         status: 'pending',
       });
 
-      // Create WhatsApp message
       const message = `🚗 حجز جديد - ${booking.bookingNumber}
 
 السيارة: ${car.nameAr}
 📅 الاستلام: ${format(pickupDate, 'dd/MM/yyyy', { locale: ar })} - ${data.pickupTime}
 📅 التسليم: ${format(dropoffDate, 'dd/MM/yyyy', { locale: ar })} - ${data.dropoffTime}
 📊 عدد الأيام: ${totalDays}
-💰 السعر الإجمالي: ${totalPrice} د.إ
 
 👤 الاسم: ${data.customerName}
 📱 الهاتف: ${data.customerPhone}
@@ -144,208 +146,220 @@ ${data.notes ? `📝 ملاحظات: ${data.notes}` : ''}`;
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
       {dateError && (
-        <Alert variant="destructive">
+        <Alert variant="destructive" className="rounded-sm">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>{dateError}</AlertDescription>
         </Alert>
       )}
 
-      {/* Date Selection */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label>تاريخ الاستلام</Label>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className={cn(
-                  'w-full justify-start text-right',
-                  !pickupDate && 'text-muted-foreground'
-                )}
-              >
-                <Calendar className="ml-2 h-4 w-4" />
-                {pickupDate ? format(pickupDate, 'dd/MM/yyyy', { locale: ar }) : 'اختر التاريخ'}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
-              <CalendarComponent
-                mode="single"
-                selected={pickupDate}
-                onSelect={setPickupDate}
-                disabled={(date) => date < new Date()}
-                initialFocus
-                className="pointer-events-auto"
-              />
-            </PopoverContent>
-          </Popover>
-        </div>
+      <div className="space-y-5">
+        <p className="text-xs font-medium tracking-[0.18em] uppercase text-primary">
+          {t.booking.schedule}
+        </p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-5">
+          <div className="space-y-2">
+            <Label className="text-foreground/80">{t.booking.pickupDate}</Label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    'w-full justify-start rounded-sm h-12 border-border/80 bg-background/60 hover:bg-background',
+                    !pickupDate && 'text-muted-foreground'
+                  )}
+                >
+                  <Calendar className="me-2 h-4 w-4 text-primary" />
+                  {pickupDate
+                    ? format(pickupDate, 'dd/MM/yyyy', { locale: lang === 'ar' ? ar : undefined })
+                    : t.booking.chooseDate}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <CalendarComponent
+                  mode="single"
+                  selected={pickupDate}
+                  onSelect={setPickupDate}
+                  disabled={(date) => date < new Date()}
+                  initialFocus
+                  className="pointer-events-auto"
+                />
+              </PopoverContent>
+            </Popover>
+          </div>
 
-        <div className="space-y-2">
-          <Label>وقت الاستلام</Label>
-          <Select onValueChange={(value) => setValue('pickupTime', value)}>
-            <SelectTrigger>
-              <SelectValue placeholder="اختر الوقت" />
-            </SelectTrigger>
-            <SelectContent>
-              {timeSlots.map((time) => (
-                <SelectItem key={time} value={time}>
-                  {time}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          {errors.pickupTime && (
-            <p className="text-sm text-destructive">{errors.pickupTime.message}</p>
-          )}
+          <div className="space-y-2">
+            <Label className="text-foreground/80">{t.booking.pickupTime}</Label>
+            <Select onValueChange={(value) => setValue('pickupTime', value)}>
+              <SelectTrigger className="rounded-sm h-12 border-border/80 bg-background/60">
+                <SelectValue placeholder={t.booking.chooseTime} />
+              </SelectTrigger>
+              <SelectContent>
+                {timeSlots.map((time) => (
+                  <SelectItem key={time} value={time}>
+                    {time}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {errors.pickupTime && (
+              <p className="text-sm text-destructive">{errors.pickupTime.message}</p>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <Label className="text-foreground/80">{t.booking.dropoffDate}</Label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    'w-full justify-start rounded-sm h-12 border-border/80 bg-background/60 hover:bg-background',
+                    !dropoffDate && 'text-muted-foreground'
+                  )}
+                >
+                  <Calendar className="me-2 h-4 w-4 text-primary" />
+                  {dropoffDate
+                    ? format(dropoffDate, 'dd/MM/yyyy', { locale: lang === 'ar' ? ar : undefined })
+                    : t.booking.chooseDate}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <CalendarComponent
+                  mode="single"
+                  selected={dropoffDate}
+                  onSelect={setDropoffDate}
+                  disabled={(date) => date < (pickupDate || new Date())}
+                  initialFocus
+                  className="pointer-events-auto"
+                />
+              </PopoverContent>
+            </Popover>
+          </div>
+
+          <div className="space-y-2">
+            <Label className="text-foreground/80">{t.booking.dropoffTime}</Label>
+            <Select onValueChange={(value) => setValue('dropoffTime', value)}>
+              <SelectTrigger className="rounded-sm h-12 border-border/80 bg-background/60">
+                <SelectValue placeholder={t.booking.chooseTime} />
+              </SelectTrigger>
+              <SelectContent>
+                {timeSlots.map((time) => (
+                  <SelectItem key={time} value={time}>
+                    {time}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {errors.dropoffTime && (
+              <p className="text-sm text-destructive">{errors.dropoffTime.message}</p>
+            )}
+          </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label>تاريخ التسليم</Label>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className={cn(
-                  'w-full justify-start text-right',
-                  !dropoffDate && 'text-muted-foreground'
-                )}
-              >
-                <Calendar className="ml-2 h-4 w-4" />
-                {dropoffDate ? format(dropoffDate, 'dd/MM/yyyy', { locale: ar }) : 'اختر التاريخ'}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
-              <CalendarComponent
-                mode="single"
-                selected={dropoffDate}
-                onSelect={setDropoffDate}
-                disabled={(date) => date < (pickupDate || new Date())}
-                initialFocus
-                className="pointer-events-auto"
-              />
-            </PopoverContent>
-          </Popover>
-        </div>
-
-        <div className="space-y-2">
-          <Label>وقت التسليم</Label>
-          <Select onValueChange={(value) => setValue('dropoffTime', value)}>
-            <SelectTrigger>
-              <SelectValue placeholder="اختر الوقت" />
-            </SelectTrigger>
-            <SelectContent>
-              {timeSlots.map((time) => (
-                <SelectItem key={time} value={time}>
-                  {time}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          {errors.dropoffTime && (
-            <p className="text-sm text-destructive">{errors.dropoffTime.message}</p>
-          )}
-        </div>
-      </div>
-
-      {/* Price Summary */}
       {totalDays > 0 && (
-        <div className="bg-muted rounded-xl p-4 space-y-2">
-          <div className="flex justify-between text-sm">
-            <span>عدد الأيام</span>
-            <span className="font-medium">{totalDays} يوم</span>
-          </div>
-          <div className="flex justify-between text-sm">
-            <span>سعر اليوم</span>
-            <span className="font-medium">{pricePerDay} د.إ</span>
-          </div>
-          <div className="border-t border-border pt-2 flex justify-between">
-            <span className="font-bold">الإجمالي</span>
-            <span className="font-bold text-primary text-lg">{totalPrice} د.إ</span>
-          </div>
+        <div className="flex items-center justify-between border-y border-border/60 py-4 text-sm">
+          <span className="tracking-[0.12em] uppercase text-muted-foreground">{t.booking.days}</span>
+          <span className="font-display text-xl tracking-wide text-foreground">
+            {totalDays} {t.booking.day}
+          </span>
         </div>
       )}
 
-      {/* Customer Details */}
-      <div className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="customerName">الاسم الكامل</Label>
-          <div className="relative">
-            <User className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input
-              id="customerName"
-              placeholder="أدخل اسمك"
-              className="pr-10"
-              {...register('customerName')}
-            />
-          </div>
-          {errors.customerName && (
-            <p className="text-sm text-destructive">{errors.customerName.message}</p>
-          )}
-        </div>
+      <div className="space-y-5">
+        <p className="text-xs font-medium tracking-[0.18em] uppercase text-primary">
+          {t.booking.customer}
+        </p>
 
-        <div className="space-y-2">
-          <Label htmlFor="customerPhone">رقم الهاتف / واتساب</Label>
-          <div className="relative">
-            <Phone className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input
-              id="customerPhone"
-              placeholder="+971 55 XXX XXXX"
-              className="pr-10"
-              {...register('customerPhone')}
-            />
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-5">
+          <div className="space-y-2 sm:col-span-2">
+            <Label htmlFor="customerName" className="text-foreground/80">
+              {t.booking.fullName}
+            </Label>
+            <div className="relative">
+              <User className="absolute end-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                id="customerName"
+                placeholder={t.booking.namePlaceholder}
+                className="pe-10 rounded-sm h-12 border-border/80 bg-background/60"
+                {...register('customerName')}
+              />
+            </div>
+            {errors.customerName && (
+              <p className="text-sm text-destructive">{errors.customerName.message}</p>
+            )}
           </div>
-          {errors.customerPhone && (
-            <p className="text-sm text-destructive">{errors.customerPhone.message}</p>
-          )}
-        </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="customerEmail">البريد الإلكتروني (اختياري)</Label>
-          <div className="relative">
-            <Mail className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input
-              id="customerEmail"
-              type="email"
-              placeholder="email@example.com"
-              className="pr-10"
-              {...register('customerEmail')}
-            />
+          <div className="space-y-2">
+            <Label htmlFor="customerPhone" className="text-foreground/80">
+              {t.booking.phone}
+            </Label>
+            <div className="relative">
+              <Phone className="absolute end-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                id="customerPhone"
+                placeholder="+971 55 XXX XXXX"
+                className="pe-10 rounded-sm h-12 border-border/80 bg-background/60"
+                dir="ltr"
+                {...register('customerPhone')}
+              />
+            </div>
+            {errors.customerPhone && (
+              <p className="text-sm text-destructive">{errors.customerPhone.message}</p>
+            )}
           </div>
-          {errors.customerEmail && (
-            <p className="text-sm text-destructive">{errors.customerEmail.message}</p>
-          )}
-        </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="notes">ملاحظات (اختياري)</Label>
-          <div className="relative">
-            <FileText className="absolute right-3 top-3 w-4 h-4 text-muted-foreground" />
-            <Textarea
-              id="notes"
-              placeholder="أي ملاحظات إضافية..."
-              className="pr-10 min-h-[80px]"
-              {...register('notes')}
-            />
+          <div className="space-y-2">
+            <Label htmlFor="customerEmail" className="text-foreground/80">
+              {t.booking.email}
+            </Label>
+            <div className="relative">
+              <Mail className="absolute end-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                id="customerEmail"
+                type="email"
+                placeholder="email@example.com"
+                className="pe-10 rounded-sm h-12 border-border/80 bg-background/60"
+                dir="ltr"
+                {...register('customerEmail')}
+              />
+            </div>
+            {errors.customerEmail && (
+              <p className="text-sm text-destructive">{errors.customerEmail.message}</p>
+            )}
+          </div>
+
+          <div className="space-y-2 sm:col-span-2">
+            <Label htmlFor="notes" className="text-foreground/80">
+              {t.booking.notes}
+            </Label>
+            <div className="relative">
+              <FileText className="absolute end-3 top-3 w-4 h-4 text-muted-foreground" />
+              <Textarea
+                id="notes"
+                placeholder={t.booking.notesPlaceholder}
+                className="pe-10 min-h-[96px] rounded-sm border-border/80 bg-background/60"
+                {...register('notes')}
+              />
+            </div>
           </div>
         </div>
       </div>
 
       <Button
         type="submit"
-        className="w-full btn-gold py-6 text-lg"
+        className="w-full btn-gold py-6 text-sm tracking-[0.16em] uppercase rounded-sm"
         disabled={isSubmitting || !pickupDate || !dropoffDate || !!dateError || !car.available}
       >
         {isSubmitting ? (
           <>
-            <Loader2 className="ml-2 h-5 w-5 animate-spin" />
-            جاري الحجز...
+            <Loader2 className="ms-2 h-5 w-5 animate-spin" />
+            {t.booking.submitting}
           </>
         ) : (
-          'تأكيد الحجز'
+          t.booking.confirm
         )}
       </Button>
     </form>

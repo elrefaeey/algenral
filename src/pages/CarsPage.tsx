@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
 import { Layout } from '@/components/layout/Layout';
 import { CarCard } from '@/components/cars/CarCard';
 import { EmptyState } from '@/components/cars/EmptyState';
@@ -9,19 +8,26 @@ import { Car } from '@/types';
 import { useSEO } from '@/hooks/useSEO';
 import { seoContent, getCanonicalUrl } from '@/utils/seoHelpers';
 import { SchemaBreadcrumb } from '@/components/seo/SchemaBreadcrumb';
-import { Loader2, ChevronRight } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const CarsPage = () => {
   const [cars, setCars] = useState<Car[]>([]);
   const [loading, setLoading] = useState(true);
+  const { t, lang } = useLanguage();
 
-  // SEO Configuration
   useSEO({
-    title: seoContent.cars.title,
-    description: seoContent.cars.description,
+    title:
+      lang === 'ar'
+        ? seoContent.cars.title
+        : 'Cars for Rent in Dubai | AL GENERAL CAR RENTAL',
+    description:
+      lang === 'ar'
+        ? seoContent.cars.description
+        : 'Discover our fleet of luxury and economy cars for rent in Dubai with airport delivery.',
     keywords: seoContent.cars.keywords,
     canonical: getCanonicalUrl('/cars'),
-    ogImage: 'https://algenral.vercel.app/src/assets/logo.png'
+    ogImage: 'https://algenral.vercel.app/logo.png',
   });
 
   useEffect(() => {
@@ -40,79 +46,83 @@ const CarsPage = () => {
 
   return (
     <Layout>
-      {/* SEO Schema Components */}
-      <SchemaBreadcrumb items={[
-        { name: 'الرئيسية', url: '/' },
-        { name: 'السيارات', url: '/cars' }
-      ]} />
+      <SchemaBreadcrumb
+        items={[
+          { name: t.nav.home, url: '/' },
+          { name: t.nav.cars, url: '/cars' },
+        ]}
+      />
 
-      <div className="section-container py-10">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-12"
-        >
-          <h1 className="text-4xl font-bold text-foreground mb-4">سيارات للإيجار في دبي</h1>
-          <p className="text-lg text-muted-foreground max-w-xl mx-auto">
-            اختر سيارتك المفضلة من مجموعتنا المتنوعة من السيارات الفاخرة والاقتصادية
-          </p>
-        </motion.div>
-
-        {/* Cars Grid */}
-        {loading ? (
-          <div className="flex items-center justify-center py-20">
-            <Loader2 className="w-10 h-10 animate-spin text-primary" />
-          </div>
-        ) : cars.length === 0 ? (
-          <EmptyState />
-        ) : (
-          <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-            {cars.map((car, index) => (
-              <CarCard key={car.id} car={car} index={index} />
-            ))}
-          </div>
-        )}
-
-        {/* SEO Content Section */}
-        {!loading && cars.length > 0 && (
+      <section className="page-band py-14 md:py-20">
+        <div className="section-container">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="mt-16 bg-muted/30 rounded-lg p-8"
+            animate={{ opacity: 1, y: 0 }}
+            className="max-w-2xl"
           >
-            <div className="max-w-4xl mx-auto text-center">
-              <h2 className="text-2xl font-bold text-foreground mb-4">
-                تأجير سيارات في دبي - خيارات متنوعة وأسعار مميزة
-              </h2>
-              <p className="text-muted-foreground leading-relaxed mb-6">
-                {seoContent.cars.intro}
-              </p>
-              <div className="grid md:grid-cols-2 gap-6 text-sm">
-                <div className="text-right">
-                  <h3 className="font-semibold text-foreground mb-2">أنواع السيارات المتاحة:</h3>
-                  <ul className="space-y-1 text-muted-foreground">
-                    <li>• سيارات اقتصادية للاستخدام اليومي</li>
-                    <li>• سيارات فاخرة للمناسبات الخاصة</li>
-                    <li>• سيارات عائلية واسعة</li>
-                    <li>• سيارات رياضية عالية الأداء</li>
+            <p className="section-eyebrow mb-3">{t.cars.eyebrow}</p>
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-4 text-balance">
+              {t.cars.title}
+            </h1>
+            <p className="text-lg text-muted-foreground leading-relaxed">{t.cars.subtitle}</p>
+          </motion.div>
+        </div>
+      </section>
+
+      <section className="py-12 md:py-16">
+        <div className="section-container">
+          {loading ? (
+            <div className="flex items-center justify-center py-20">
+              <Loader2 className="w-10 h-10 animate-spin text-primary" />
+            </div>
+          ) : cars.length === 0 ? (
+            <EmptyState />
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+              {cars.map((car, index) => (
+                <CarCard key={car.id} car={car} index={index} />
+              ))}
+            </div>
+          )}
+
+          {!loading && cars.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="mt-20 max-w-3xl"
+            >
+              <div className="luxury-divider mx-0 mb-8 w-16" />
+              <h2 className="text-2xl font-bold text-foreground mb-4">{t.cars.seoTitle}</h2>
+              <p className="text-muted-foreground leading-relaxed mb-8">{t.cars.seoIntro}</p>
+              <div className="grid md:grid-cols-2 gap-8 text-sm">
+                <div>
+                  <h3 className="font-semibold text-foreground mb-3">{t.cars.typesTitle}</h3>
+                  <ul className="space-y-2 text-muted-foreground">
+                    {[t.cars.type1, t.cars.type2, t.cars.type3, t.cars.type4].map((item) => (
+                      <li key={item} className="border-s-2 border-primary/40 ps-3">
+                        {item}
+                      </li>
+                    ))}
                   </ul>
                 </div>
-                <div className="text-right">
-                  <h3 className="font-semibold text-foreground mb-2">خدماتنا المميزة:</h3>
-                  <ul className="space-y-1 text-muted-foreground">
-                    <li>• توصيل مجاني لمطار دبي</li>
-                    <li>• تأجير يومي وأسبوعي وشهري</li>
-                    <li>• تأمين شامل على جميع السيارات</li>
-                    <li>• خدمة عملاء 24 ساعة</li>
+                <div>
+                  <h3 className="font-semibold text-foreground mb-3">{t.cars.servicesTitle}</h3>
+                  <ul className="space-y-2 text-muted-foreground">
+                    {[t.cars.service1, t.cars.service2, t.cars.service3, t.cars.service4].map(
+                      (item) => (
+                        <li key={item} className="border-s-2 border-primary/40 ps-3">
+                          {item}
+                        </li>
+                      )
+                    )}
                   </ul>
                 </div>
               </div>
-            </div>
-          </motion.div>
-        )}
-      </div>
+            </motion.div>
+          )}
+        </div>
+      </section>
     </Layout>
   );
 };

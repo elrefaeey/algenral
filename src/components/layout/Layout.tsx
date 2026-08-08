@@ -8,11 +8,11 @@ interface LayoutProps {
   showFooter?: boolean;
 }
 
-export const Layout = ({ children, showFooter = false }: LayoutProps) => {
+export const Layout = ({ children, showFooter = true }: LayoutProps) => {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
-      <main className="flex-1 pt-32 md:pt-28">
+      <main className="flex-1 pt-16 md:pt-[4.5rem] bg-background">
         {children}
       </main>
       {showFooter && <Footer />}

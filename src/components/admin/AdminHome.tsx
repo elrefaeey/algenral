@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Image, Video, Loader2, Trash2, Link } from 'lucide-react';
+import { Image, Video, Loader2, Trash2, Link as LinkIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -30,7 +30,6 @@ export const AdminHome = () => {
         setBackgroundUrlInput(data.backgroundUrl);
       } catch (error) {
         console.error('Error fetching home content:', error);
-        // Use default content if there's an error
         setContent(defaultHomeContent);
         setBackgroundUrlInput('');
       } finally {
@@ -42,19 +41,19 @@ export const AdminHome = () => {
 
   const handleBackgroundUrlChange = () => {
     if (backgroundUrlInput.trim()) {
-      // Detect if it's a video URL
-      const isVideo = backgroundUrlInput.includes('.mp4') || 
-                     backgroundUrlInput.includes('.webm') || 
-                     backgroundUrlInput.includes('.ogg') ||
-                     backgroundUrlInput.includes('youtube.com') ||
-                     backgroundUrlInput.includes('vimeo.com');
-      
+      const isVideo =
+        backgroundUrlInput.includes('.mp4') ||
+        backgroundUrlInput.includes('.webm') ||
+        backgroundUrlInput.includes('.ogg') ||
+        backgroundUrlInput.includes('youtube.com') ||
+        backgroundUrlInput.includes('vimeo.com');
+
       setContent((prev) => ({
         ...prev,
         backgroundUrl: backgroundUrlInput.trim(),
         backgroundType: isVideo ? 'video' : 'image',
       }));
-      
+
       toast.success('تم تحديث رابط الخلفية');
     }
   };
@@ -86,16 +85,18 @@ export const AdminHome = () => {
       animate={{ opacity: 1, y: 0 }}
       className="space-y-6"
     >
-      <h2 className="text-2xl font-bold">إعدادات الصفحة الرئيسية</h2>
+      <div>
+        <p className="section-eyebrow mb-2">Homepage</p>
+        <h2 className="text-xl sm:text-2xl font-bold">إعدادات الصفحة الرئيسية</h2>
+        <p className="text-sm text-muted-foreground mt-1">تحكم في الهيرو والنصوص والأزرار</p>
+      </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-        {/* Background Settings */}
-        <div className="bg-card rounded-xl border border-border p-4 sm:p-6 space-y-4">
-          <h3 className="text-lg font-semibold">الخلفية</h3>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5">
+        <div className="rounded-md border border-border/60 bg-card p-4 sm:p-6 space-y-4">
+          <h3 className="font-semibold text-foreground">الخلفية</h3>
 
-          {/* Current Background */}
           {content.backgroundUrl && (
-            <div className="relative aspect-video rounded-lg overflow-hidden bg-muted">
+            <div className="relative aspect-video rounded-md overflow-hidden bg-muted border border-border/50">
               {content.backgroundType === 'video' ? (
                 <video
                   src={content.backgroundUrl}
@@ -112,15 +113,15 @@ export const AdminHome = () => {
                 />
               )}
               <button
+                type="button"
                 onClick={() => setContent({ ...content, backgroundUrl: '' })}
-                className="absolute top-2 left-2 p-2 bg-destructive rounded-lg text-white hover:bg-destructive/90"
+                className="absolute top-2 left-2 p-2 bg-destructive rounded-md text-white hover:bg-destructive/90"
               >
                 <Trash2 className="w-4 h-4" />
               </button>
             </div>
           )}
 
-          {/* Background URL Input */}
           <div className="space-y-2">
             <Label>رابط الخلفية</Label>
             <div className="flex gap-2">
@@ -128,20 +129,19 @@ export const AdminHome = () => {
                 placeholder="https://example.com/image.jpg"
                 value={backgroundUrlInput}
                 onChange={(e) => setBackgroundUrlInput(e.target.value)}
-                className="flex-1"
+                className="flex-1 rounded-md"
               />
               <Button
                 onClick={handleBackgroundUrlChange}
                 variant="outline"
                 size="sm"
-                className="px-3"
+                className="px-3 rounded-md"
               >
-                <Link className="w-4 h-4" />
+                <LinkIcon className="w-4 h-4" />
               </Button>
             </div>
           </div>
 
-          {/* Type */}
           <div className="space-y-2">
             <Label>نوع الخلفية</Label>
             <Select
@@ -150,7 +150,7 @@ export const AdminHome = () => {
                 setContent({ ...content, backgroundType: value })
               }
             >
-              <SelectTrigger>
+              <SelectTrigger className="rounded-md">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -171,15 +171,15 @@ export const AdminHome = () => {
           </div>
         </div>
 
-        {/* Text Settings */}
-        <div className="bg-card rounded-xl border border-border p-4 sm:p-6 space-y-4">
-          <h3 className="text-lg font-semibold">النصوص</h3>
+        <div className="rounded-md border border-border/60 bg-card p-4 sm:p-6 space-y-4">
+          <h3 className="font-semibold text-foreground">النصوص</h3>
 
           <div className="space-y-2">
             <Label>العنوان الرئيسي</Label>
             <Input
               value={content.mainTitle}
               onChange={(e) => setContent({ ...content, mainTitle: e.target.value })}
+              className="rounded-md"
             />
           </div>
 
@@ -188,6 +188,7 @@ export const AdminHome = () => {
             <Input
               value={content.subtitle}
               onChange={(e) => setContent({ ...content, subtitle: e.target.value })}
+              className="rounded-md"
             />
           </div>
 
@@ -196,6 +197,7 @@ export const AdminHome = () => {
             <Input
               value={content.ctaButtonText}
               onChange={(e) => setContent({ ...content, ctaButtonText: e.target.value })}
+              className="rounded-md"
             />
           </div>
 
@@ -204,24 +206,22 @@ export const AdminHome = () => {
             <Input
               value={content.whatsappButtonText}
               onChange={(e) => setContent({ ...content, whatsappButtonText: e.target.value })}
+              className="rounded-md"
             />
           </div>
         </div>
 
-        {/* Visibility Settings */}
-        <div className="bg-card rounded-xl border border-border p-4 sm:p-6 space-y-4 lg:col-span-2">
-          <h3 className="text-lg font-semibold">إظهار/إخفاء العناصر</h3>
-
+        <div className="rounded-md border border-border/60 bg-card p-4 sm:p-6 space-y-4 lg:col-span-2">
+          <h3 className="font-semibold text-foreground">إظهار / إخفاء العناصر</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between rounded-md border border-border/50 px-4 py-3">
               <Label>إظهار زر الحجز</Label>
               <Switch
                 checked={content.showCta}
                 onCheckedChange={(checked) => setContent({ ...content, showCta: checked })}
               />
             </div>
-
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between rounded-md border border-border/50 px-4 py-3">
               <Label>إظهار زر واتساب</Label>
               <Switch
                 checked={content.showWhatsapp}
@@ -232,9 +232,8 @@ export const AdminHome = () => {
         </div>
       </div>
 
-      {/* Save Button */}
       <div className="flex justify-end">
-        <Button onClick={handleSave} className="btn-gold" disabled={isSaving}>
+        <Button onClick={handleSave} className="btn-gold rounded-md" disabled={isSaving}>
           {isSaving ? (
             <>
               <Loader2 className="w-4 h-4 ml-2 animate-spin" />

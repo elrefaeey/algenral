@@ -2,94 +2,90 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&display=swap');
-
-/* AL GENERAL CAR RENTAL - Premium White & Dark Blue Theme */
+/* AL GENERAL — Dubai Luxury Editorial */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 220 20% 15%;
+    /* Cool pearl — not flat white, not cream terracotta */
+    --background: 40 12% 97%;
+    --foreground: 210 28% 10%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 220 20% 15%;
+    --card: 40 20% 99%;
+    --card-foreground: 210 28% 10%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 220 20% 15%;
+    --popover: 40 20% 99%;
+    --popover-foreground: 210 28% 10%;
 
-    /* Primary: dark blue */
-    --primary: 220 75% 35%;
-    --primary-foreground: 0 0% 100%;
+    /* Champagne bronze — Dubai metal accent */
+    --primary: 36 42% 46%;
+    --primary-foreground: 40 20% 99%;
 
-    --secondary: 220 14% 96%;
-    --secondary-foreground: 220 20% 15%;
+    --secondary: 210 14% 93%;
+    --secondary-foreground: 210 28% 10%;
 
-    --muted: 220 14% 96%;
-    --muted-foreground: 220 10% 50%;
+    --muted: 40 10% 93%;
+    --muted-foreground: 210 10% 42%;
 
-    --accent: 220 75% 35%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 36 42% 46%;
+    --accent-foreground: 40 20% 99%;
 
-    --destructive: 0 84% 60%;
+    --destructive: 0 72% 48%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 14% 90%;
-    --input: 220 14% 90%;
-    --ring: 220 75% 35%;
+    --border: 210 12% 88%;
+    --input: 210 12% 88%;
+    --ring: 36 42% 46%;
 
-    --radius: 0.75rem;
+    --radius: 0.5rem;
 
-    /* Custom tokens (renamed visually to blue, names kept for compatibility) */
-    --gold: 220 75% 35%;
-    --gold-light: 220 70% 55%;
-    --gold-dark: 220 80% 25%;
-    --gray-warm: 220 14% 96%;
-    --gray-medium: 220 10% 75%;
-    --text-primary: 220 20% 15%;
-    --text-secondary: 220 10% 45%;
+    /* Legacy gold tokens → champagne */
+    --gold: 36 42% 46%;
+    --gold-light: 38 48% 58%;
+    --gold-dark: 34 45% 34%;
+    --gray-warm: 40 10% 93%;
+    --gray-medium: 210 8% 70%;
+    --text-primary: 210 28% 10%;
+    --text-secondary: 210 10% 42%;
 
-    --shadow-soft: 0 4px 20px -2px hsl(220 20% 15% / 0.08);
-    --shadow-medium: 0 8px 30px -4px hsl(220 20% 15% / 0.12);
-    --shadow-gold: 0 8px 30px -4px hsl(220 75% 35% / 0.25);
+    /* Ink for dark bands (footer / hero wash) */
+    --ink: 210 28% 10%;
+    --ink-soft: 210 22% 16%;
+    --pearl: 40 12% 97%;
 
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --shadow-soft: 0 2px 16px -4px hsl(210 28% 10% / 0.08);
+    --shadow-medium: 0 12px 40px -12px hsl(210 28% 10% / 0.14);
+    --shadow-gold: 0 10px 28px -10px hsl(36 42% 46% / 0.28);
+
+    --sidebar-background: 40 12% 97%;
+    --sidebar-foreground: 210 28% 10%;
+    --sidebar-primary: 36 42% 46%;
+    --sidebar-primary-foreground: 40 20% 99%;
+    --sidebar-accent: 40 10% 93%;
+    --sidebar-accent-foreground: 210 28% 10%;
+    --sidebar-border: 210 12% 88%;
+    --sidebar-ring: 36 42% 46%;
   }
 
   .dark {
-    --background: 220 20% 10%;
-    --foreground: 0 0% 98%;
-    --card: 220 20% 12%;
-    --card-foreground: 0 0% 98%;
-    --popover: 220 20% 12%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 220 70% 60%;
-    --primary-foreground: 220 20% 10%;
-    --secondary: 220 20% 18%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 220 20% 18%;
-    --muted-foreground: 220 10% 60%;
-    --accent: 220 70% 60%;
-    --accent-foreground: 220 20% 10%;
-    --destructive: 0 62.8% 50%;
+    --background: 210 28% 8%;
+    --foreground: 40 12% 96%;
+    --card: 210 24% 11%;
+    --card-foreground: 40 12% 96%;
+    --popover: 210 24% 11%;
+    --popover-foreground: 40 12% 96%;
+    --primary: 38 48% 58%;
+    --primary-foreground: 210 28% 8%;
+    --secondary: 210 20% 16%;
+    --secondary-foreground: 40 12% 96%;
+    --muted: 210 20% 16%;
+    --muted-foreground: 210 10% 62%;
+    --accent: 38 48% 58%;
+    --accent-foreground: 210 28% 8%;
+    --destructive: 0 62% 50%;
     --destructive-foreground: 0 0% 98%;
-    --border: 220 20% 20%;
-    --input: 220 20% 20%;
-    --ring: 220 70% 60%;
-    --sidebar-background: 220 20% 10%;
-    --sidebar-foreground: 0 0% 98%;
-    --sidebar-primary: 220 70% 60%;
-    --sidebar-primary-foreground: 220 20% 10%;
-    --sidebar-accent: 220 20% 15%;
-    --sidebar-accent-foreground: 0 0% 98%;
-    --sidebar-border: 220 20% 18%;
-    --sidebar-ring: 220 70% 60%;
+    --border: 210 18% 20%;
+    --input: 210 18% 20%;
+    --ring: 38 48% 58%;
   }
 }
 
@@ -99,34 +95,32 @@
   }
 
   html {
-    direction: rtl;
-    font-family: 'Aref Ruqaa', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+    scroll-behavior: smooth;
   }
 
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: 'Aref Ruqaa', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+    font-family: 'Tajawal', system-ui, sans-serif;
+    background-image:
+      radial-gradient(ellipse 80% 50% at 100% -10%, hsl(36 42% 46% / 0.06), transparent),
+      radial-gradient(ellipse 60% 40% at 0% 100%, hsl(210 28% 10% / 0.03), transparent);
+    background-attachment: fixed;
   }
 
-  * {
-    font-family: 'Aref Ruqaa', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Tajawal', system-ui, sans-serif;
+    letter-spacing: -0.01em;
   }
 
-  h1, h2, h3, h4, h5, h6,
-  button,
-  input,
-  textarea,
-  p,
-  span,
-  div,
-  a {
-    font-family: 'Aref Ruqaa', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
+  .font-display {
+    font-family: 'Cormorant Garamond', 'Times New Roman', serif;
+    letter-spacing: 0.04em;
   }
 }
 
 @layer components {
   .glass-card {
-    @apply bg-white/80 backdrop-blur-lg border border-white/20 shadow-soft;
+    @apply bg-card/80 backdrop-blur-md border border-border/60 shadow-soft;
   }
 
   .gold-gradient {
@@ -134,18 +128,25 @@
   }
 
   .text-gold-gradient {
-    @apply bg-gradient-to-l from-gold to-gold-dark bg-clip-text text-transparent;
+    @apply bg-gradient-to-l from-gold-dark via-gold to-gold-light bg-clip-text text-transparent;
   }
 
   .btn-gold {
-    @apply bg-primary text-primary-foreground hover:bg-primary/90 
-           shadow-gold transition-all duration-300 
-           hover:shadow-lg hover:-translate-y-0.5;
+    @apply bg-primary text-primary-foreground
+           transition-all duration-300 ease-out
+           hover:bg-gold-dark hover:-translate-y-0.5
+           shadow-gold;
   }
 
   .btn-outline-gold {
-    @apply border-2 border-primary text-primary bg-transparent
+    @apply border border-primary/70 text-foreground bg-transparent
            hover:bg-primary hover:text-primary-foreground
+           transition-all duration-300;
+  }
+
+  .btn-ghost-light {
+    @apply border border-white/40 text-white bg-white/5 backdrop-blur-sm
+           hover:bg-white hover:text-foreground
            transition-all duration-300;
   }
 
@@ -154,11 +155,39 @@
   }
 
   .logo-container {
-    @apply flex items-center justify-center p-1 bg-white rounded-lg;
+    @apply flex items-center justify-center;
   }
 
   .logo-image {
     @apply w-full h-full object-contain;
+  }
+
+  .section-eyebrow {
+    @apply text-xs sm:text-sm font-medium tracking-[0.2em] uppercase text-primary;
+  }
+
+  .nav-link {
+    @apply relative px-3 py-2 text-sm font-medium text-foreground/70
+           transition-colors duration-300 hover:text-foreground;
+  }
+
+  .nav-link-active {
+    @apply text-foreground;
+  }
+
+  .nav-link-active::after {
+    content: '';
+    @apply absolute bottom-0 inset-x-3 h-px bg-primary;
+  }
+
+  .page-band {
+    @apply relative overflow-hidden border-b border-border/60;
+    background:
+      linear-gradient(135deg, hsl(var(--muted)) 0%, hsl(var(--background)) 55%, hsl(36 42% 46% / 0.06) 100%);
+  }
+
+  .luxury-divider {
+    @apply mx-auto h-px w-16 bg-gradient-to-l from-transparent via-primary to-transparent;
   }
 }
 
@@ -173,6 +202,10 @@
 
   .shadow-gold {
     box-shadow: var(--shadow-gold);
+  }
+
+  .text-balance {
+    text-wrap: balance;
   }
 
   .scrollbar-hide {

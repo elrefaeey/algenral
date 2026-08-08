@@ -1,81 +1,82 @@
 import { Link } from 'react-router-dom';
-import { Car, Phone, MapPin, Lock } from 'lucide-react';
+import { Phone, MapPin, Lock } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export const Footer = () => {
+  const { t } = useLanguage();
+
   return (
-    <footer className="bg-foreground text-background py-12">
-      <div className="section-container">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {/* Company Info */}
+    <footer className="bg-ink text-white relative overflow-hidden">
+      <div
+        className="absolute inset-0 opacity-40 pointer-events-none"
+        style={{
+          background:
+            'radial-gradient(ellipse 50% 60% at 50% 0%, hsl(36 42% 46% / 0.18), transparent)',
+        }}
+      />
+      <div className="section-container relative py-14 md:py-16">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-12">
           <div className="space-y-4">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-lg bg-primary flex items-center justify-center">
-                <Car className="w-7 h-7 text-primary-foreground" />
-              </div>
-              <div>
-                <h3 className="font-bold text-lg">AL GENERAL CAR RENTAL</h3>
-                <p className="text-sm text-background/70">الچينرال لتأجير السيارات</p>
-              </div>
+            <div>
+              <p className="font-display text-3xl tracking-[0.14em] text-white">AL GENERAL</p>
+              <p className="text-sm text-white/60 mt-1">{t.brand.tagline}</p>
             </div>
-            <p className="text-sm text-background/70 leading-relaxed">
-              متخصصون في تأجير السيارات الفاخرة في دبي. نقدم خدمة احترافية وأسعار تنافسية للأفراد والشركات.
-            </p>
+            <div className="luxury-divider mx-0 w-12" />
+            <p className="text-sm text-white/65 leading-relaxed max-w-sm">{t.footer.desc}</p>
           </div>
 
-          {/* Contact Info */}
           <div className="space-y-4">
-            <h4 className="font-semibold text-lg">معلومات التواصل</h4>
+            <h4 className="font-semibold text-white tracking-wide">{t.footer.contactInfo}</h4>
             <div className="space-y-3">
-              <div className="flex items-center gap-3 text-sm">
-                <MapPin className="w-5 h-5 text-primary flex-shrink-0" />
-                <span className="text-background/80">
-                  مكتب 302، هور العنز شرق - دبي - الإمارات
-                </span>
+              <div className="flex items-start gap-3 text-sm">
+                <MapPin className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                <span className="text-white/70">{t.footer.address}</span>
               </div>
               <div className="flex items-center gap-3 text-sm">
-                <Phone className="w-5 h-5 text-primary flex-shrink-0" />
-                <a href="tel:00971555900747" className="text-background/80 hover:text-primary transition-colors">
+                <Phone className="w-4 h-4 text-primary flex-shrink-0" />
+                <a
+                  href="tel:00971555900747"
+                  className="text-white/70 hover:text-primary transition-colors"
+                  dir="ltr"
+                >
                   00971555900747
                 </a>
               </div>
             </div>
           </div>
 
-          {/* Quick Links */}
           <div className="space-y-4">
-            <h4 className="font-semibold text-lg">روابط سريعة</h4>
-            <nav className="flex flex-col gap-2">
-              <Link to="/" className="text-sm text-background/80 hover:text-primary transition-colors">
-                الرئيسية
-              </Link>
-              <Link to="/cars" className="text-sm text-background/80 hover:text-primary transition-colors">
-                السيارات
-              </Link>
-              <Link to="/about" className="text-sm text-background/80 hover:text-primary transition-colors">
-                من نحن
-              </Link>
-              <Link to="/contact" className="text-sm text-background/80 hover:text-primary transition-colors">
-                تواصل معنا
-              </Link>
+            <h4 className="font-semibold text-white tracking-wide">{t.footer.quickLinks}</h4>
+            <nav className="flex flex-col gap-2.5">
+              {[
+                { to: '/', label: t.nav.home },
+                { to: '/cars', label: t.nav.cars },
+                { to: '/about', label: t.nav.about },
+                { to: '/contact', label: t.nav.contact },
+              ].map((link) => (
+                <Link
+                  key={link.to}
+                  to={link.to}
+                  className="text-sm text-white/70 hover:text-primary transition-colors w-fit"
+                >
+                  {link.label}
+                </Link>
+              ))}
             </nav>
           </div>
         </div>
 
-        {/* Bottom Bar */}
-        <div className="mt-10 pt-6 border-t border-background/10 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="text-center sm:text-right">
-            <p className="text-sm text-background/60">
-              الرخصة التجارية رقم: 1175479
+        <div className="mt-12 pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="text-center sm:text-start">
+            <p className="text-xs text-white/45">
+              {t.footer.license} 1175479
             </p>
-            <p className="text-sm text-background/60 mt-1">
-              © 2026 الچينرال لتأجير السيارات. جميع الحقوق محفوظة.
-            </p>
+            <p className="text-xs text-white/45 mt-1">{t.footer.rights}</p>
           </div>
-          
-          {/* Admin Lock Icon */}
           <Link
             to="/admin-login"
-            className="flex items-center gap-2 text-background/40 hover:text-primary transition-colors text-sm"
+            className="flex items-center gap-2 text-white/30 hover:text-primary transition-colors text-sm"
+            aria-label="Admin"
           >
             <Lock className="w-4 h-4" />
           </Link>

@@ -8,7 +8,7 @@ export const SchemaOrganization = () => {
       "name": "AL GENERAL CAR RENTAL",
       "alternateName": "الچينرال لتأجير السيارات",
       "url": "https://algenral.vercel.app",
-      "logo": "https://algenral.vercel.app/src/assets/logo.png",
+      "logo": "https://algenral.vercel.app/logo.png",
       "description": "شركة رائدة في تأجير السيارات في دبي والإمارات العربية المتحدة",
       "address": {
         "@type": "PostalAddress",
