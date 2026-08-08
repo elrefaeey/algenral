@@ -14,8 +14,8 @@ export const Footer = () => {
             'radial-gradient(ellipse 50% 60% at 50% 0%, hsl(36 42% 46% / 0.18), transparent)',
         }}
       />
-      <div className="section-container relative py-14 md:py-16">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-12">
+      <div className="section-container relative py-10 sm:py-14 md:py-16">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
           <div className="space-y-4">
             <div>
               <p className="font-display text-3xl tracking-[0.14em] text-white">AL GENERAL</p>

@@ -34,25 +34,25 @@ const ContactPage = () => {
         ]}
       />
 
-      <section className="page-band py-14 md:py-20">
+      <section className="page-band py-10 sm:py-14 md:py-20">
         <div className="section-container">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="max-w-2xl"
           >
-            <p className="section-eyebrow mb-3">{t.contact.eyebrow}</p>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-4">
+            <p className="section-eyebrow mb-2 sm:mb-3">{t.contact.eyebrow}</p>
+            <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold text-foreground mb-3 sm:mb-4">
               {t.contact.title}
             </h1>
-            <p className="text-lg text-muted-foreground leading-relaxed">{t.contact.subtitle}</p>
+            <p className="text-base sm:text-lg text-muted-foreground leading-relaxed">{t.contact.subtitle}</p>
           </motion.div>
         </div>
       </section>
 
-      <section className="py-16 md:py-20">
+      <section className="py-10 sm:py-16 md:py-20">
         <div className="section-container">
-          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16">
+          <div className="grid lg:grid-cols-2 gap-8 sm:gap-12 lg:gap-16">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}

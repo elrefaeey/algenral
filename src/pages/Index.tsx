@@ -115,41 +115,40 @@ const Index = () => {
               />
             </AnimatePresence>
           )}
-          {/* Lighter overlays — keep text readable without heavy fog */}
-          <div className="absolute inset-0 bg-gradient-to-t from-ink/85 via-ink/25 to-ink/30" />
+          <div className="absolute inset-0 bg-gradient-to-t from-ink/90 via-ink/35 to-ink/40" />
           <div className="absolute inset-0 bg-gradient-to-l from-transparent via-transparent to-ink/45" />
         </div>
 
-        <div className="relative z-10 section-container w-full pt-28 pb-16 md:py-28">
+        <div className="relative z-10 section-container w-full pt-24 pb-20 sm:pt-28 sm:pb-16 md:py-28">
           <motion.div
             initial={{ opacity: 0, y: 36 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
-            className="relative max-w-2xl space-y-6 md:space-y-8"
+            className="relative max-w-2xl space-y-4 sm:space-y-6 md:space-y-8"
           >
             <div
-              className="pointer-events-none absolute -inset-4 sm:-inset-8 -z-10 rounded-2xl"
+              className="pointer-events-none absolute -inset-3 sm:-inset-8 -z-10 rounded-2xl"
               style={{
                 background:
-                  'radial-gradient(ellipse at center, hsl(210 28% 8% / 0.45), transparent 70%)',
+                  'radial-gradient(ellipse at center, hsl(210 28% 8% / 0.5), transparent 70%)',
               }}
             />
-            <div className="space-y-3">
-              <p className="font-display text-white text-4xl sm:text-5xl md:text-6xl lg:text-7xl tracking-[0.16em] leading-none drop-shadow-[0_2px_14px_rgba(0,0,0,0.65)]">
+            <div className="space-y-2 sm:space-y-3">
+              <p className="font-display text-white text-[2rem] sm:text-5xl md:text-6xl lg:text-7xl tracking-[0.12em] sm:tracking-[0.16em] leading-none drop-shadow-[0_2px_14px_rgba(0,0,0,0.65)]">
                 AL GENERAL
               </p>
-              <p className="text-primary text-sm sm:text-base font-medium tracking-[0.28em] drop-shadow-[0_1px_8px_rgba(0,0,0,0.7)]">
+              <p className="text-primary text-xs sm:text-sm md:text-base font-medium tracking-[0.18em] sm:tracking-[0.28em] drop-shadow-[0_1px_8px_rgba(0,0,0,0.7)]">
                 {t.brand.tagline}
               </p>
             </div>
 
-            <div className="luxury-divider mx-0 w-20 bg-gradient-to-l from-transparent via-primary to-primary" />
+            <div className="luxury-divider mx-0 w-16 sm:w-20 bg-gradient-to-l from-transparent via-primary to-primary" />
 
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white leading-snug text-balance drop-shadow-[0_2px_12px_rgba(0,0,0,0.6)]">
+            <h1 className="text-xl sm:text-3xl md:text-4xl font-bold text-white leading-snug text-balance drop-shadow-[0_2px_12px_rgba(0,0,0,0.6)]">
               {t.home.headline}
             </h1>
 
-            <p className="text-base sm:text-lg text-white/90 max-w-xl leading-relaxed drop-shadow-[0_1px_8px_rgba(0,0,0,0.55)]">
+            <p className="text-sm sm:text-base md:text-lg text-white/90 max-w-xl leading-relaxed drop-shadow-[0_1px_8px_rgba(0,0,0,0.55)]">
               {subtitle}
             </p>
 
@@ -157,10 +156,10 @@ const Index = () => {
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.35, duration: 0.7 }}
-              className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2"
+              className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3 pt-1 sm:pt-2"
             >
               {homeContent.showCta && (
-                <Button asChild size="lg" className="btn-gold px-8 py-6 text-base rounded-md">
+                <Button asChild size="lg" className="btn-gold px-6 sm:px-8 py-5 sm:py-6 text-sm sm:text-base rounded-md touch-manipulation">
                   <Link to="/cars">
                     {ctaText}
                     <Chevron className="ms-2 w-5 h-5" />
@@ -171,7 +170,7 @@ const Index = () => {
                 <Button
                   asChild
                   size="lg"
-                  className="bg-white text-ink hover:bg-white/90 px-8 py-6 text-base rounded-md font-semibold border-0"
+                  className="bg-white text-ink hover:bg-white/90 px-6 sm:px-8 py-5 sm:py-6 text-sm sm:text-base rounded-md font-semibold border-0 touch-manipulation"
                 >
                   <a
                     href="https://wa.me/971555900747"
@@ -187,15 +186,15 @@ const Index = () => {
         </div>
 
         {!useVideo && (
-          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex items-center gap-2">
+          <div className="absolute bottom-5 sm:bottom-8 left-1/2 -translate-x-1/2 z-10 flex items-center gap-2">
             {HERO_SLIDES.map((_, i) => (
               <button
                 key={i}
                 type="button"
                 aria-label={`Slide ${i + 1}`}
                 onClick={() => setHeroIndex(i)}
-                className={`h-1.5 rounded-full transition-all duration-500 ${
-                  i === heroIndex ? 'w-8 bg-primary' : 'w-2.5 bg-white/45 hover:bg-white/70'
+                className={`h-1.5 rounded-full transition-all duration-500 touch-manipulation ${
+                  i === heroIndex ? 'w-7 sm:w-8 bg-primary' : 'w-2.5 bg-white/45 hover:bg-white/70'
                 }`}
               />
             ))}
@@ -203,19 +202,19 @@ const Index = () => {
         )}
       </section>
 
-      <section className="py-20 md:py-24">
+      <section className="py-12 sm:py-16 md:py-24">
         <div className="section-container">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="mb-12 md:mb-14 max-w-2xl"
+            className="mb-8 sm:mb-12 md:mb-14 max-w-2xl"
           >
-            <p className="section-eyebrow mb-3">{t.home.fleetEyebrow}</p>
-            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-3">
+            <p className="section-eyebrow mb-2 sm:mb-3">{t.home.fleetEyebrow}</p>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-2 sm:mb-3">
               {t.home.fleetTitle}
             </h2>
-            <p className="text-muted-foreground text-lg">{t.home.fleetDesc}</p>
+            <p className="text-muted-foreground text-base sm:text-lg">{t.home.fleetDesc}</p>
           </motion.div>
 
           {loading ? (
@@ -244,7 +243,7 @@ const Index = () => {
         </div>
       </section>
 
-      <section className="py-20 md:py-24 relative overflow-hidden">
+      <section className="py-12 sm:py-16 md:py-24 relative overflow-hidden">
         <div className="absolute inset-0 bg-ink" />
         <div
           className="absolute inset-0 opacity-50"

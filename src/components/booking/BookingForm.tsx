@@ -146,7 +146,7 @@ ${data.notes ? `📝 ملاحظات: ${data.notes}` : ''}`;
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 sm:space-y-8">
       {dateError && (
         <Alert variant="destructive" className="rounded-sm">
           <AlertCircle className="h-4 w-4" />
@@ -154,11 +154,11 @@ ${data.notes ? `📝 ملاحظات: ${data.notes}` : ''}`;
         </Alert>
       )}
 
-      <div className="space-y-5">
+      <div className="space-y-4 sm:space-y-5">
         <p className="text-xs font-medium tracking-[0.18em] uppercase text-primary">
           {t.booking.schedule}
         </p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 md:gap-5">
           <div className="space-y-2">
             <Label className="text-foreground/80">{t.booking.pickupDate}</Label>
             <Popover>
@@ -166,7 +166,7 @@ ${data.notes ? `📝 ملاحظات: ${data.notes}` : ''}`;
                 <Button
                   variant="outline"
                   className={cn(
-                    'w-full justify-start rounded-sm h-12 border-border/80 bg-background/60 hover:bg-background',
+                    'w-full justify-start rounded-sm h-11 sm:h-12 border-border/80 bg-background/60 hover:bg-background text-sm touch-manipulation',
                     !pickupDate && 'text-muted-foreground'
                   )}
                 >

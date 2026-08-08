@@ -12,7 +12,7 @@ export const HomeLayout = ({ children, showFooter = true }: HomeLayoutProps) => 
   return (
     <div className="min-h-screen flex flex-col">
       <HomeHeader />
-      <main className="flex-1">
+      <main className="flex-1 overflow-x-hidden pb-20 sm:pb-0">
         {children}
       </main>
       {showFooter && <Footer />}

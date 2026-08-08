@@ -12,7 +12,7 @@ export const Layout = ({ children, showFooter = true }: LayoutProps) => {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
-      <main className="flex-1 pt-16 md:pt-[4.5rem] bg-background">
+      <main className="flex-1 pt-14 sm:pt-16 md:pt-[4.5rem] pb-20 sm:pb-8 bg-background overflow-x-hidden">
         {children}
       </main>
       {showFooter && <Footer />}

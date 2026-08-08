@@ -12,9 +12,11 @@ export const WhatsAppButton = () => {
       href={`https://wa.me/${whatsappNumber}?text=${message}`}
       target="_blank"
       rel="noopener noreferrer"
-      className={`fixed bottom-6 z-50 flex items-center gap-2.5 bg-[#25D366] text-white px-4 py-3 rounded-md shadow-medium hover:brightness-110 transition-all ${
-        isRTL ? 'left-6' : 'right-6'
-      }`}
+      className={`fixed z-50 flex items-center justify-center gap-2 bg-[#25D366] text-white shadow-medium hover:brightness-110 transition-all touch-manipulation bottom-[max(1rem,env(safe-area-inset-bottom))] sm:bottom-6 ${
+        isRTL
+          ? 'left-[max(1rem,env(safe-area-inset-left))] sm:left-6'
+          : 'right-[max(1rem,env(safe-area-inset-right))] sm:right-6'
+      } w-12 h-12 sm:w-auto sm:h-auto sm:px-4 sm:py-3 rounded-full sm:rounded-md`}
       initial={{ y: 24, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ delay: 0.8, duration: 0.45 }}

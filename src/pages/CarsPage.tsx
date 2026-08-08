@@ -53,23 +53,23 @@ const CarsPage = () => {
         ]}
       />
 
-      <section className="page-band py-14 md:py-20">
+      <section className="page-band py-10 sm:py-14 md:py-20">
         <div className="section-container">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="max-w-2xl"
           >
-            <p className="section-eyebrow mb-3">{t.cars.eyebrow}</p>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-4 text-balance">
+            <p className="section-eyebrow mb-2 sm:mb-3">{t.cars.eyebrow}</p>
+            <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold text-foreground mb-3 sm:mb-4 text-balance">
               {t.cars.title}
             </h1>
-            <p className="text-lg text-muted-foreground leading-relaxed">{t.cars.subtitle}</p>
+            <p className="text-base sm:text-lg text-muted-foreground leading-relaxed">{t.cars.subtitle}</p>
           </motion.div>
         </div>
       </section>
 
-      <section className="py-12 md:py-16">
+      <section className="py-8 sm:py-12 md:py-16">
         <div className="section-container">
           {loading ? (
             <div className="flex items-center justify-center py-20">
@@ -78,7 +78,7 @@ const CarsPage = () => {
           ) : cars.length === 0 ? (
             <EmptyState />
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
               {cars.map((car, index) => (
                 <CarCard key={car.id} car={car} index={index} />
               ))}

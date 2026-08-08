@@ -31,12 +31,13 @@ export const CarCard = ({ car, index = 0 }: CarCardProps) => {
         aria-disabled={!car.available}
       >
         <article className="relative h-full flex flex-col overflow-hidden rounded-md bg-card border border-border/50 transition-all duration-500 hover:border-primary/35 hover:shadow-medium">
-          <div className="relative aspect-[16/11] sm:aspect-[5/4] overflow-hidden bg-muted min-h-[220px] sm:min-h-[260px]">
+          <div className="relative aspect-[4/3] sm:aspect-[5/4] overflow-hidden bg-muted">
             {car.images && car.images.length > 0 ? (
               <img
                 src={car.images[0]}
                 alt={`${title} - ${car.year}`}
                 className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                loading="lazy"
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center">
@@ -45,7 +46,7 @@ export const CarCard = ({ car, index = 0 }: CarCardProps) => {
             )}
             <div className="absolute inset-0 bg-gradient-to-t from-ink/35 via-transparent to-transparent opacity-70" />
             <span
-              className={`absolute top-3 end-3 text-[11px] font-medium tracking-wide px-2.5 py-1 rounded-sm ${
+              className={`absolute top-2.5 end-2.5 sm:top-3 sm:end-3 text-[10px] sm:text-[11px] font-medium tracking-wide px-2 sm:px-2.5 py-1 rounded-sm ${
                 car.available
                   ? 'bg-background/90 text-foreground backdrop-blur-sm'
                   : 'bg-destructive/90 text-white'
@@ -55,12 +56,12 @@ export const CarCard = ({ car, index = 0 }: CarCardProps) => {
             </span>
           </div>
 
-          <div className="p-4 md:p-5 flex-1 flex flex-col gap-3">
+          <div className="p-3.5 sm:p-4 md:p-5 flex-1 flex flex-col gap-2.5 sm:gap-3">
             <div>
-              <h3 className="font-bold text-lg text-foreground leading-tight group-hover:text-primary transition-colors">
+              <h3 className="font-bold text-base sm:text-lg text-foreground leading-tight group-hover:text-primary transition-colors">
                 {title}
               </h3>
-              <p className="text-sm text-muted-foreground mt-1 font-display tracking-wide">
+              <p className="text-xs sm:text-sm text-muted-foreground mt-1 font-display tracking-wide">
                 {subtitle}
               </p>
             </div>
