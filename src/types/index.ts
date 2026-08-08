@@ -15,6 +15,13 @@ export interface Car {
   category: string;
   year: number;
   order?: number;
+  /** Optional SEO overrides from admin */
+  slug?: string;
+  metaTitle?: string;
+  metaTitleAr?: string;
+  metaDescription?: string;
+  metaDescriptionAr?: string;
+  imageAlts?: string[];
   createdAt: Date;
   updatedAt: Date;
 }

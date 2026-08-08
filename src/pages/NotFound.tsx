@@ -1,10 +1,18 @@
 import { useLocation, Link } from 'react-router-dom';
 import { useEffect } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useSEO } from '@/hooks/useSEO';
 
 const NotFound = () => {
   const location = useLocation();
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
+
+  useSEO({
+    title: `${t.notFound.title} | AL GENERAL CAR RENTAL`,
+    description: t.notFound.desc,
+    noindex: true,
+    lang,
+  });
 
   useEffect(() => {
     console.error('404 Error: User attempted to access non-existent route:', location.pathname);

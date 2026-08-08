@@ -2,25 +2,22 @@ import { motion } from 'framer-motion';
 import { Building, Award, Users, Clock, MapPin, Phone, Shield } from 'lucide-react';
 import { Layout } from '@/components/layout/Layout';
 import { useSEO } from '@/hooks/useSEO';
-import { seoContent, getCanonicalUrl } from '@/utils/seoHelpers';
+import { getPageSeo, getCanonicalUrl } from '@/utils/seoHelpers';
 import { SchemaBreadcrumb } from '@/components/seo/SchemaBreadcrumb';
+import { SchemaLocalBusiness } from '@/components/seo/SchemaLocalBusiness';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 const AboutPage = () => {
   const { t, lang } = useLanguage();
+  const pageSeo = getPageSeo('about', lang);
 
   useSEO({
-    title:
-      lang === 'ar'
-        ? seoContent.about.title
-        : 'About Us | AL GENERAL CAR RENTAL Dubai',
-    description:
-      lang === 'ar'
-        ? seoContent.about.description
-        : 'Learn about AL GENERAL CAR RENTAL, a leading car rental company in Dubai with premium service.',
-    keywords: seoContent.about.keywords,
+    title: pageSeo.title,
+    description: pageSeo.description,
+    keywords: pageSeo.keywords,
     canonical: getCanonicalUrl('/about'),
     ogImage: 'https://algenral.vercel.app/logo.png',
+    lang,
   });
 
   const stats = [
@@ -32,6 +29,7 @@ const AboutPage = () => {
 
   return (
     <Layout>
+      <SchemaLocalBusiness />
       <SchemaBreadcrumb
         items={[
           { name: t.nav.home, url: '/' },

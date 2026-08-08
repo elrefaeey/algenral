@@ -6,7 +6,7 @@ import { EmptyState } from '@/components/cars/EmptyState';
 import { getCars } from '@/services/firebaseService';
 import { Car } from '@/types';
 import { useSEO } from '@/hooks/useSEO';
-import { seoContent, getCanonicalUrl } from '@/utils/seoHelpers';
+import { getPageSeo, getCanonicalUrl } from '@/utils/seoHelpers';
 import { SchemaBreadcrumb } from '@/components/seo/SchemaBreadcrumb';
 import { Loader2 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -15,19 +15,15 @@ const CarsPage = () => {
   const [cars, setCars] = useState<Car[]>([]);
   const [loading, setLoading] = useState(true);
   const { t, lang } = useLanguage();
+  const pageSeo = getPageSeo('cars', lang);
 
   useSEO({
-    title:
-      lang === 'ar'
-        ? seoContent.cars.title
-        : 'Cars for Rent in Dubai | AL GENERAL CAR RENTAL',
-    description:
-      lang === 'ar'
-        ? seoContent.cars.description
-        : 'Discover our fleet of luxury and economy cars for rent in Dubai with airport delivery.',
-    keywords: seoContent.cars.keywords,
+    title: pageSeo.title,
+    description: pageSeo.description,
+    keywords: pageSeo.keywords,
     canonical: getCanonicalUrl('/cars'),
     ogImage: 'https://algenral.vercel.app/logo.png',
+    lang,
   });
 
   useEffect(() => {
@@ -94,7 +90,8 @@ const CarsPage = () => {
             >
               <div className="luxury-divider mx-0 mb-8 w-16" />
               <h2 className="text-2xl font-bold text-foreground mb-4">{t.cars.seoTitle}</h2>
-              <p className="text-muted-foreground leading-relaxed mb-8">{t.cars.seoIntro}</p>
+              <p className="text-muted-foreground leading-relaxed mb-4">{t.cars.seoIntro}</p>
+              <p className="text-muted-foreground leading-relaxed mb-8">{t.cars.seoExtra}</p>
               <div className="grid md:grid-cols-2 gap-8 text-sm">
                 <div>
                   <h3 className="font-semibold text-foreground mb-3">{t.cars.typesTitle}</h3>

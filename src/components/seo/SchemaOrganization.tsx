@@ -1,65 +1,77 @@
 import { useEffect } from 'react';
+import { defaultSiteSettings, SiteSettings } from '@/types';
+import { SITE_URL } from '@/utils/seoHelpers';
 
-export const SchemaOrganization = () => {
+interface SchemaOrganizationProps {
+  settings?: SiteSettings;
+}
+
+export const SchemaOrganization = ({
+  settings = defaultSiteSettings,
+}: SchemaOrganizationProps) => {
   useEffect(() => {
+    const phone = settings.phone.replace(/^00/, '+').replace(/\s/g, '');
+    const whatsapp = settings.whatsapp.replace(/[^\d]/g, '');
+
     const schema = {
-      "@context": "https://schema.org",
-      "@type": "Organization",
-      "name": "AL GENERAL CAR RENTAL",
-      "alternateName": "الچينرال لتأجير السيارات",
-      "url": "https://algenral.vercel.app",
-      "logo": "https://algenral.vercel.app/logo.png",
-      "description": "شركة رائدة في تأجير السيارات في دبي والإمارات العربية المتحدة",
-      "address": {
-        "@type": "PostalAddress",
-        "streetAddress": "دبي، الإمارات العربية المتحدة",
-        "addressLocality": "دبي",
-        "addressCountry": "AE"
+      '@context': 'https://schema.org',
+      '@type': 'Organization',
+      name: settings.companyName,
+      alternateName: settings.companyNameAr,
+      url: SITE_URL,
+      logo: `${SITE_URL}/logo.png`,
+      description:
+        'Leading car rental company in Dubai — luxury and everyday cars with airport delivery and 24/7 support.',
+      address: {
+        '@type': 'PostalAddress',
+        streetAddress: settings.address,
+        addressLocality: 'Dubai',
+        addressRegion: 'Dubai',
+        addressCountry: 'AE',
       },
-      "contactPoint": {
-        "@type": "ContactPoint",
-        "telephone": "+971-XX-XXX-XXXX",
-        "contactType": "customer service",
-        "availableLanguage": ["Arabic", "English"],
-        "hoursAvailable": {
-          "@type": "OpeningHoursSpecification",
-          "dayOfWeek": [
-            "Monday", "Tuesday", "Wednesday", "Thursday", 
-            "Friday", "Saturday", "Sunday"
+      contactPoint: {
+        '@type': 'ContactPoint',
+        telephone: phone.startsWith('+') ? phone : `+${phone}`,
+        contactType: 'customer service',
+        availableLanguage: ['Arabic', 'English'],
+        areaServed: 'AE',
+        hoursAvailable: {
+          '@type': 'OpeningHoursSpecification',
+          dayOfWeek: [
+            'Monday',
+            'Tuesday',
+            'Wednesday',
+            'Thursday',
+            'Friday',
+            'Saturday',
+            'Sunday',
           ],
-          "opens": "00:00",
-          "closes": "23:59"
-        }
+          opens: '00:00',
+          closes: '23:59',
+        },
       },
-      "sameAs": [
-        "https://wa.me/971XXXXXXXXX"
-      ],
-      "serviceArea": {
-        "@type": "Place",
-        "name": "Dubai, UAE"
-      }
+      email: settings.email,
+      sameAs: [`https://wa.me/${whatsapp}`],
+      identifier: settings.licenseNumber,
+      serviceArea: {
+        '@type': 'Place',
+        name: 'Dubai, UAE',
+      },
     };
 
     const script = document.createElement('script');
     script.type = 'application/ld+json';
     script.text = JSON.stringify(schema);
     script.id = 'schema-organization';
-    
-    // Remove existing schema if present
+
     const existing = document.getElementById('schema-organization');
-    if (existing) {
-      existing.remove();
-    }
-    
+    if (existing) existing.remove();
     document.head.appendChild(script);
 
     return () => {
-      const schemaScript = document.getElementById('schema-organization');
-      if (schemaScript) {
-        schemaScript.remove();
-      }
+      document.getElementById('schema-organization')?.remove();
     };
-  }, []);
+  }, [settings]);
 
   return null;
 };

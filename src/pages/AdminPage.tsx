@@ -10,6 +10,7 @@ import {
   Home,
   BarChart3,
   LayoutTemplate,
+  Settings,
 } from 'lucide-react';
 import logoSrc from '@/assets/logo-removebg-preview.png';
 import { Button } from '@/components/ui/button';
@@ -19,10 +20,11 @@ import { Car as CarType, Booking } from '@/types';
 import { AdminCars } from '@/components/admin/AdminCars';
 import { AdminBookings } from '@/components/admin/AdminBookings';
 import { AdminHome } from '@/components/admin/AdminHome';
+import { AdminSettings } from '@/components/admin/AdminSettings';
 import { useSEO } from '@/hooks/useSEO';
 import { toast } from 'sonner';
 
-type TabType = 'dashboard' | 'home' | 'cars' | 'bookings';
+type TabType = 'dashboard' | 'home' | 'cars' | 'bookings' | 'settings';
 
 const AdminPage = () => {
   const [activeTab, setActiveTab] = useState<TabType>('dashboard');
@@ -90,6 +92,7 @@ const AdminPage = () => {
     { id: 'home' as TabType, label: 'الرئيسية', icon: LayoutTemplate },
     { id: 'cars' as TabType, label: 'السيارات', icon: Car },
     { id: 'bookings' as TabType, label: 'الحجوزات', icon: Calendar },
+    { id: 'settings' as TabType, label: 'إعدادات الشركة', icon: Settings },
   ];
 
   const stats = [
@@ -207,6 +210,14 @@ const AdminPage = () => {
                   <LayoutTemplate className="w-4 h-4 ml-2" />
                   إعدادات الرئيسية
                 </Button>
+                <Button
+                  onClick={() => setActiveTab('settings')}
+                  variant="outline"
+                  className="rounded-md flex-1 sm:flex-none"
+                >
+                  <Settings className="w-4 h-4 ml-2" />
+                  إعدادات الشركة
+                </Button>
               </div>
             </div>
           </motion.div>
@@ -224,6 +235,7 @@ const AdminPage = () => {
             loading={loading}
           />
         )}
+        {activeTab === 'settings' && <AdminSettings />}
       </div>
     </div>
   );

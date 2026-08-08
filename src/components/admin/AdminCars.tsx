@@ -46,7 +46,9 @@ interface AdminCarsProps {
   loading: boolean;
 }
 
-const initialCarState: Omit<Car, 'id' | 'createdAt' | 'updatedAt'> = {
+type CarForm = Omit<Car, 'id' | 'createdAt' | 'updatedAt'>;
+
+const initialCarState: CarForm = {
   name: '',
   nameAr: '',
   images: [],
@@ -62,14 +64,24 @@ const initialCarState: Omit<Car, 'id' | 'createdAt' | 'updatedAt'> = {
   category: '',
   year: new Date().getFullYear(),
   order: 999,
+  slug: '',
+  metaTitle: '',
+  metaTitleAr: '',
+  metaDescription: '',
+  metaDescriptionAr: '',
+  imageAlts: [],
 };
+
+const SectionTitle = ({ children }: { children: React.ReactNode }) => (
+  <p className="text-xs font-medium tracking-[0.16em] uppercase text-primary pt-2">{children}</p>
+);
 
 export const AdminCars = ({ cars, onRefresh, loading }: AdminCarsProps) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [selectedCar, setSelectedCar] = useState<Car | null>(null);
   const [carToDelete, setCarToDelete] = useState<Car | null>(null);
-  const [formData, setFormData] = useState<Omit<Car, 'id' | 'createdAt' | 'updatedAt'>>(initialCarState);
+  const [formData, setFormData] = useState<CarForm>(initialCarState);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [imageUrl, setImageUrl] = useState('');
 
@@ -80,9 +92,9 @@ export const AdminCars = ({ cars, onRefresh, loading }: AdminCarsProps) => {
         name: car.name,
         nameAr: car.nameAr,
         images: car.images || [],
-        priceDaily: car.priceDaily,
-        priceWeekly: car.priceWeekly,
-        priceMonthly: car.priceMonthly,
+        priceDaily: car.priceDaily ?? 0,
+        priceWeekly: car.priceWeekly ?? 0,
+        priceMonthly: car.priceMonthly ?? 0,
         transmission: car.transmission,
         passengers: car.passengers,
         fuelType: car.fuelType,
@@ -92,6 +104,12 @@ export const AdminCars = ({ cars, onRefresh, loading }: AdminCarsProps) => {
         category: car.category || '',
         year: car.year,
         order: car.order ?? 999,
+        slug: car.slug || '',
+        metaTitle: car.metaTitle || '',
+        metaTitleAr: car.metaTitleAr || '',
+        metaDescription: car.metaDescription || '',
+        metaDescriptionAr: car.metaDescriptionAr || '',
+        imageAlts: car.imageAlts || [],
       });
     } else {
       setSelectedCar(null);
@@ -110,6 +128,7 @@ export const AdminCars = ({ cars, onRefresh, loading }: AdminCarsProps) => {
     setFormData((prev) => ({
       ...prev,
       images: [...prev.images, trimmed],
+      imageAlts: [...(prev.imageAlts || []), ''],
     }));
     setImageUrl('');
     toast.success('تم إضافة رابط الصورة');
@@ -119,6 +138,7 @@ export const AdminCars = ({ cars, onRefresh, loading }: AdminCarsProps) => {
     setFormData((prev) => ({
       ...prev,
       images: prev.images.filter((_, i) => i !== index),
+      imageAlts: (prev.imageAlts || []).filter((_, i) => i !== index),
     }));
   };
 
@@ -126,17 +146,26 @@ export const AdminCars = ({ cars, onRefresh, loading }: AdminCarsProps) => {
     e.preventDefault();
 
     if (!formData.nameAr || !formData.name) {
-      toast.error('يرجى إدخال اسم السيارة');
+      toast.error('يرجى إدخال اسم السيارة بالعربي والإنجليزي');
       return;
     }
 
     setIsSubmitting(true);
     try {
+      const payload: CarForm = {
+        ...formData,
+        slug: formData.slug?.trim() || undefined,
+        metaTitle: formData.metaTitle?.trim() || undefined,
+        metaTitleAr: formData.metaTitleAr?.trim() || undefined,
+        metaDescription: formData.metaDescription?.trim() || undefined,
+        metaDescriptionAr: formData.metaDescriptionAr?.trim() || undefined,
+      };
+
       if (selectedCar) {
-        await updateCar(selectedCar.id, formData);
+        await updateCar(selectedCar.id, payload);
         toast.success('تم تحديث السيارة بنجاح');
       } else {
-        await addCar(formData);
+        await addCar(payload);
         toast.success('تم إضافة السيارة بنجاح');
       }
       setIsDialogOpen(false);
@@ -185,6 +214,9 @@ export const AdminCars = ({ cars, onRefresh, loading }: AdminCarsProps) => {
         <div>
           <p className="section-eyebrow mb-2">Fleet</p>
           <h2 className="text-xl sm:text-2xl font-bold">إدارة السيارات</h2>
+          <p className="text-sm text-muted-foreground mt-1">
+            بيانات السيارة + الأسعار + وصف SEO (الأسعار لا تظهر للزائر)
+          </p>
         </div>
         <Button onClick={() => handleOpenDialog()} className="btn-gold rounded-md w-full sm:w-auto">
           <Plus className="w-4 h-4 ml-2" />
@@ -238,6 +270,11 @@ export const AdminCars = ({ cars, onRefresh, loading }: AdminCarsProps) => {
                     <p className="text-xs sm:text-sm text-muted-foreground truncate font-display tracking-wide">
                       {car.name}
                     </p>
+                    {car.category && (
+                      <span className="text-[10px] bg-muted text-muted-foreground px-1.5 py-0.5 rounded-sm">
+                        {car.category}
+                      </span>
+                    )}
                     {car.order !== undefined && (
                       <span className="text-[10px] bg-primary/10 text-primary px-1.5 py-0.5 rounded-sm">
                         ترتيب: {car.order}
@@ -246,6 +283,8 @@ export const AdminCars = ({ cars, onRefresh, loading }: AdminCarsProps) => {
                   </div>
                   <p className="text-xs sm:text-sm text-primary font-semibold mt-0.5">
                     {car.priceDaily} د.إ / يوم
+                    {car.priceWeekly ? ` · ${car.priceWeekly} أسبوعي` : ''}
+                    {car.priceMonthly ? ` · ${car.priceMonthly} شهري` : ''}
                   </p>
                 </div>
 
@@ -290,7 +329,7 @@ export const AdminCars = ({ cars, onRefresh, loading }: AdminCarsProps) => {
       )}
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto rounded-md">
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto rounded-md">
           <DialogHeader>
             <DialogTitle className="text-xl">
               {selectedCar ? 'تعديل السيارة' : 'إضافة سيارة جديدة'}
@@ -298,12 +337,12 @@ export const AdminCars = ({ cars, onRefresh, loading }: AdminCarsProps) => {
           </DialogHeader>
 
           <form onSubmit={handleSubmit} className="space-y-5">
+            <SectionTitle>الصور</SectionTitle>
             <div className="space-y-3">
-              <Label>صور السيارة</Label>
               <div className="flex flex-wrap gap-3">
                 {formData.images.map((url, index) => (
                   <div
-                    key={index}
+                    key={`${url}-${index}`}
                     className="relative w-24 h-24 rounded-md overflow-hidden group border border-border/50"
                   >
                     <img src={url} alt="" className="w-full h-full object-cover" />
@@ -321,7 +360,7 @@ export const AdminCars = ({ cars, onRefresh, loading }: AdminCarsProps) => {
                 <Input
                   value={imageUrl}
                   onChange={(e) => setImageUrl(e.target.value)}
-                  placeholder="ضع رابط الصورة هنا ثم اضغط إضافة"
+                  placeholder="ضع رابط الصورة ثم اضغط إضافة"
                   className="rounded-md"
                 />
                 <Button type="button" variant="outline" onClick={addImageUrl} className="rounded-md">
@@ -330,35 +369,44 @@ export const AdminCars = ({ cars, onRefresh, loading }: AdminCarsProps) => {
               </div>
             </div>
 
+            <SectionTitle>البيانات الأساسية</SectionTitle>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>اسم السيارة (عربي)</Label>
+                <Label>اسم السيارة (عربي) *</Label>
                 <Input
                   value={formData.nameAr}
                   onChange={(e) => setFormData({ ...formData, nameAr: e.target.value })}
-                  placeholder="مثال: مرسيدس S500"
+                  placeholder="مثال: رانج روفر"
                   className="rounded-md"
                 />
               </div>
               <div className="space-y-2">
-                <Label>اسم السيارة (إنجليزي)</Label>
+                <Label>اسم السيارة (إنجليزي) *</Label>
                 <Input
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  placeholder="e.g. Mercedes S500"
+                  placeholder="e.g. Range Rover"
                   className="rounded-md"
                 />
               </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label>السعر اليومي (د.إ)</Label>
-              <Input
-                type="number"
-                value={formData.priceDaily}
-                onChange={(e) => setFormData({ ...formData, priceDaily: +e.target.value })}
-                className="rounded-md"
-              />
+              <div className="space-y-2">
+                <Label>الفئة</Label>
+                <Input
+                  value={formData.category}
+                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                  placeholder="Luxury / SUV / Economy"
+                  className="rounded-md"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>سنة الصنع</Label>
+                <Input
+                  type="number"
+                  value={formData.year}
+                  onChange={(e) => setFormData({ ...formData, year: +e.target.value })}
+                  className="rounded-md"
+                />
+              </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -398,24 +446,12 @@ export const AdminCars = ({ cars, onRefresh, loading }: AdminCarsProps) => {
                   </SelectContent>
                 </Select>
               </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="space-y-2">
                 <Label>عدد الركاب</Label>
                 <Input
                   type="number"
                   value={formData.passengers}
                   onChange={(e) => setFormData({ ...formData, passengers: +e.target.value })}
-                  className="rounded-md"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>سنة الصنع</Label>
-                <Input
-                  type="number"
-                  value={formData.year}
-                  onChange={(e) => setFormData({ ...formData, year: +e.target.value })}
                   className="rounded-md"
                 />
               </div>
@@ -431,14 +467,109 @@ export const AdminCars = ({ cars, onRefresh, loading }: AdminCarsProps) => {
               </div>
             </div>
 
+            <SectionTitle>الأسعار (للإدارة و Google فقط — مخفية عن الزائر)</SectionTitle>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <Label>يومي (د.إ)</Label>
+                <Input
+                  type="number"
+                  value={formData.priceDaily}
+                  onChange={(e) => setFormData({ ...formData, priceDaily: +e.target.value })}
+                  className="rounded-md"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>أسبوعي (د.إ)</Label>
+                <Input
+                  type="number"
+                  value={formData.priceWeekly}
+                  onChange={(e) => setFormData({ ...formData, priceWeekly: +e.target.value })}
+                  className="rounded-md"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>شهري (د.إ)</Label>
+                <Input
+                  type="number"
+                  value={formData.priceMonthly}
+                  onChange={(e) => setFormData({ ...formData, priceMonthly: +e.target.value })}
+                  className="rounded-md"
+                />
+              </div>
+            </div>
+
+            <SectionTitle>الوصف</SectionTitle>
             <div className="space-y-2">
               <Label>الوصف (عربي)</Label>
               <Textarea
                 value={formData.descriptionAr}
                 onChange={(e) => setFormData({ ...formData, descriptionAr: e.target.value })}
-                placeholder="وصف مختصر للسيارة..."
-                className="rounded-md"
+                placeholder="وصف مختصر بالعربية..."
+                className="rounded-md min-h-[90px]"
               />
+            </div>
+            <div className="space-y-2">
+              <Label>الوصف (إنجليزي)</Label>
+              <Textarea
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                placeholder="Short English description..."
+                className="rounded-md min-h-[90px]"
+                dir="ltr"
+              />
+            </div>
+
+            <SectionTitle>SEO (اختياري)</SectionTitle>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-2 sm:col-span-2">
+                <Label>Slug (رابط مخصص)</Label>
+                <Input
+                  value={formData.slug || ''}
+                  onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+                  placeholder="range-rover-2026"
+                  className="rounded-md"
+                  dir="ltr"
+                />
+                <p className="text-xs text-muted-foreground">
+                  إن تُرك فارغاً يُستخدم معرّف Firebase في الرابط
+                </p>
+              </div>
+              <div className="space-y-2">
+                <Label>Meta Title (عربي)</Label>
+                <Input
+                  value={formData.metaTitleAr || ''}
+                  onChange={(e) => setFormData({ ...formData, metaTitleAr: e.target.value })}
+                  className="rounded-md"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Meta Title (English)</Label>
+                <Input
+                  value={formData.metaTitle || ''}
+                  onChange={(e) => setFormData({ ...formData, metaTitle: e.target.value })}
+                  className="rounded-md"
+                  dir="ltr"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Meta Description (عربي)</Label>
+                <Textarea
+                  value={formData.metaDescriptionAr || ''}
+                  onChange={(e) =>
+                    setFormData({ ...formData, metaDescriptionAr: e.target.value })
+                  }
+                  className="rounded-md"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Meta Description (English)</Label>
+                <Textarea
+                  value={formData.metaDescription || ''}
+                  onChange={(e) => setFormData({ ...formData, metaDescription: e.target.value })}
+                  className="rounded-md"
+                  dir="ltr"
+                />
+              </div>
             </div>
 
             <div className="flex items-center justify-between rounded-md border border-border/50 px-4 py-3">

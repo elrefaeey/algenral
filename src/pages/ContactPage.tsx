@@ -4,29 +4,27 @@ import { Link } from 'react-router-dom';
 import { Layout } from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
 import { useSEO } from '@/hooks/useSEO';
-import { seoContent, getCanonicalUrl } from '@/utils/seoHelpers';
+import { getPageSeo, getCanonicalUrl } from '@/utils/seoHelpers';
 import { SchemaBreadcrumb } from '@/components/seo/SchemaBreadcrumb';
+import { SchemaLocalBusiness } from '@/components/seo/SchemaLocalBusiness';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 const ContactPage = () => {
   const { t, lang } = useLanguage();
+  const pageSeo = getPageSeo('contact', lang);
 
   useSEO({
-    title:
-      lang === 'ar'
-        ? seoContent.contact.title
-        : 'Contact Us | AL GENERAL CAR RENTAL Dubai',
-    description:
-      lang === 'ar'
-        ? seoContent.contact.description
-        : 'Contact AL GENERAL CAR RENTAL in Dubai. 24/7 support and airport delivery.',
-    keywords: seoContent.contact.keywords,
+    title: pageSeo.title,
+    description: pageSeo.description,
+    keywords: pageSeo.keywords,
     canonical: getCanonicalUrl('/contact'),
     ogImage: 'https://algenral.vercel.app/logo.png',
+    lang,
   });
 
   return (
     <Layout>
+      <SchemaLocalBusiness />
       <SchemaBreadcrumb
         items={[
           { name: t.nav.home, url: '/' },

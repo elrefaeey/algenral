@@ -172,22 +172,29 @@ export const AdminHome = () => {
         </div>
 
         <div className="rounded-md border border-border/60 bg-card p-4 sm:p-6 space-y-4">
-          <h3 className="font-semibold text-foreground">النصوص</h3>
+          <div>
+            <h3 className="font-semibold text-foreground">نصوص الهيرو (عربي)</h3>
+            <p className="text-xs text-muted-foreground mt-1">
+              العنوان الرئيسي يظهر كـ H1 في الصفحة الرئيسية عند اختيار العربية
+            </p>
+          </div>
 
           <div className="space-y-2">
-            <Label>العنوان الرئيسي</Label>
+            <Label>العنوان الرئيسي (H1)</Label>
             <Input
               value={content.mainTitle}
               onChange={(e) => setContent({ ...content, mainTitle: e.target.value })}
+              placeholder="تأجير سيارات فاخرة في دبي"
               className="rounded-md"
             />
           </div>
 
           <div className="space-y-2">
-            <Label>العنوان الفرعي</Label>
+            <Label>العنوان الفرعي تحت الـ H1</Label>
             <Input
               value={content.subtitle}
               onChange={(e) => setContent({ ...content, subtitle: e.target.value })}
+              placeholder="وصف قصير يظهر تحت العنوان"
               className="rounded-md"
             />
           </div>

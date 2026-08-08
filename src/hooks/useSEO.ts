@@ -7,6 +7,7 @@ interface SEOProps {
   ogImage?: string;
   canonical?: string;
   noindex?: boolean;
+  lang?: 'ar' | 'en';
 }
 
 export const useSEO = ({
@@ -15,66 +16,66 @@ export const useSEO = ({
   keywords,
   ogImage,
   canonical,
-  noindex = false
+  noindex = false,
+  lang = 'ar',
 }: SEOProps) => {
   useEffect(() => {
-    // Update document title
     document.title = title;
+    document.documentElement.lang = lang;
 
-    // Update meta description
     updateMetaTag('name', 'description', description);
 
-    // Update keywords if provided
     if (keywords) {
       updateMetaTag('name', 'keywords', keywords);
     }
 
-    // Update Open Graph tags
     updateMetaTag('property', 'og:title', title);
     updateMetaTag('property', 'og:description', description);
-    
-    if (ogImage) {
-      updateMetaTag('property', 'og:image', ogImage);
-    }
+    updateMetaTag('property', 'og:type', 'website');
+    updateMetaTag('property', 'og:locale', lang === 'ar' ? 'ar_AE' : 'en_AE');
+    updateMetaTag(
+      'property',
+      'og:locale:alternate',
+      lang === 'ar' ? 'en_AE' : 'ar_AE'
+    );
+    updateMetaTag('property', 'og:site_name', 'AL GENERAL CAR RENTAL');
 
-    // Update Twitter tags
-    updateMetaTag('name', 'twitter:title', title);
-    updateMetaTag('name', 'twitter:description', description);
-
-    // Update canonical URL
     if (canonical) {
+      updateMetaTag('property', 'og:url', canonical);
       updateLinkTag('canonical', canonical);
     }
 
-    // Handle noindex
-    if (noindex) {
-      updateMetaTag('name', 'robots', 'noindex, nofollow');
-    } else {
-      updateMetaTag('name', 'robots', 'index, follow');
-    }
-  }, [title, description, keywords, ogImage, canonical, noindex]);
+    const image = ogImage || 'https://algenral.vercel.app/logo.png';
+    updateMetaTag('property', 'og:image', image);
+    updateMetaTag('name', 'twitter:card', 'summary_large_image');
+    updateMetaTag('name', 'twitter:title', title);
+    updateMetaTag('name', 'twitter:description', description);
+    updateMetaTag('name', 'twitter:image', image);
+
+    updateMetaTag('name', 'robots', noindex ? 'noindex, nofollow' : 'index, follow');
+  }, [title, description, keywords, ogImage, canonical, noindex, lang]);
 };
 
 const updateMetaTag = (attribute: string, value: string, content: string) => {
   let element = document.querySelector(`meta[${attribute}="${value}"]`);
-  
+
   if (!element) {
     element = document.createElement('meta');
     element.setAttribute(attribute, value);
     document.head.appendChild(element);
   }
-  
+
   element.setAttribute('content', content);
 };
 
 const updateLinkTag = (rel: string, href: string) => {
   let element = document.querySelector(`link[rel="${rel}"]`);
-  
+
   if (!element) {
     element = document.createElement('link');
     element.setAttribute('rel', rel);
     document.head.appendChild(element);
   }
-  
+
   element.setAttribute('href', href);
 };

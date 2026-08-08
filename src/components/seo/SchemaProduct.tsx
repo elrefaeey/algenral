@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { Car } from '@/types';
+import { SITE_URL, toAbsoluteUrl, getCarPath } from '@/utils/seoHelpers';
 
 interface SchemaProductProps {
   car: Car;
@@ -7,53 +8,76 @@ interface SchemaProductProps {
 
 export const SchemaProduct = ({ car }: SchemaProductProps) => {
   useEffect(() => {
+    const path = getCarPath(car);
+    const url = `${SITE_URL}${path}`;
+    const brandName = car.name.split(' ')[0] || 'AL GENERAL';
+    const images = (car.images || []).map((img, i) => ({
+      url: toAbsoluteUrl(img),
+      alt: car.imageAlts?.[i] || `${car.name} ${car.nameAr}`,
+    }));
+
+    const offer: Record<string, unknown> = {
+      '@type': 'Offer',
+      availability: car.available
+        ? 'https://schema.org/InStock'
+        : 'https://schema.org/OutOfStock',
+      priceCurrency: 'AED',
+      url,
+      seller: {
+        '@type': 'Organization',
+        name: 'AL GENERAL CAR RENTAL',
+      },
+    };
+
+    if (car.priceDaily > 0) {
+      offer.price = car.priceDaily;
+      offer.unitText = 'DAY';
+      offer.priceValidUntil = new Date(Date.now() + 1000 * 60 * 60 * 24 * 90)
+        .toISOString()
+        .slice(0, 10);
+    }
+
     const schema = {
       '@context': 'https://schema.org',
       '@type': 'Product',
-      '@id': `https://algenral.vercel.app/cars/${car.id}`,
-      name: car.nameAr,
+      '@id': url,
+      name: car.nameAr || car.name,
       alternateName: car.name,
-      description: car.descriptionAr,
-      category: 'Vehicle Rental',
+      description: car.descriptionAr || car.description || `Rent ${car.name} in Dubai`,
+      category: car.category || 'Vehicle Rental',
       brand: {
         '@type': 'Brand',
-        name: car.name.split(' ')[0],
+        name: brandName,
       },
       model: car.name,
-      vehicleModelDate: car.year.toString(),
-      image: car.images.map((img) => `https://algenral.vercel.app${img}`),
-      offers: {
-        '@type': 'Offer',
-        availability: car.available
-          ? 'https://schema.org/InStock'
-          : 'https://schema.org/OutOfStock',
-        priceCurrency: 'AED',
-        url: `https://algenral.vercel.app/cars/${car.id}`,
-        seller: {
-          '@type': 'Organization',
-          name: 'AL GENERAL CAR RENTAL',
-        },
-      },
+      vehicleModelDate: String(car.year),
+      image: images.map((i) => i.url),
+      offers: offer,
       additionalProperty: [
         {
           '@type': 'PropertyValue',
-          name: 'عدد الركاب',
-          value: car.passengers.toString(),
+          name: 'passengers',
+          value: String(car.passengers),
         },
         {
           '@type': 'PropertyValue',
-          name: 'نوع الوقود',
+          name: 'fuelType',
           value: car.fuelType,
         },
         {
           '@type': 'PropertyValue',
-          name: 'ناقل الحركة',
+          name: 'transmission',
           value: car.transmission,
+        },
+        {
+          '@type': 'PropertyValue',
+          name: 'year',
+          value: String(car.year),
         },
       ],
       manufacturer: {
         '@type': 'Organization',
-        name: car.name.split(' ')[0],
+        name: brandName,
       },
     };
 
@@ -63,17 +87,11 @@ export const SchemaProduct = ({ car }: SchemaProductProps) => {
     script.id = `schema-product-${car.id}`;
 
     const existing = document.getElementById(`schema-product-${car.id}`);
-    if (existing) {
-      existing.remove();
-    }
-
+    if (existing) existing.remove();
     document.head.appendChild(script);
 
     return () => {
-      const schemaScript = document.getElementById(`schema-product-${car.id}`);
-      if (schemaScript) {
-        schemaScript.remove();
-      }
+      document.getElementById(`schema-product-${car.id}`)?.remove();
     };
   }, [car]);
 

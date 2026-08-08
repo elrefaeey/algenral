@@ -35,20 +35,55 @@ export const translations = {
       waDefault: 'تواصل واتساب',
       experienceIntro:
         'شركة AL GENERAL CAR RENTAL هي إحدى الشركات الرائدة في مجال تأجير السيارات في دبي والإمارات. نقدم خدمات تأجير بأسعار تنافسية وجودة عالية، مع أسطول واسع من السيارات الفاخرة والاقتصادية، وتوصيل للمطار وخدمة عملاء على مدار الساعة.',
+      localTitle: 'تأجير سيارات في أهم مناطق دبي',
+      localDesc:
+        'نغطي مطار دبي (DXB)، دبي مارينا، داون تاون، الخليج التجاري، وجبل علي — مع توصيل واستلام مرن يومي وأسبوعي وشهري.',
+    },
+    faq: {
+      eyebrow: 'أسئلة شائعة',
+      title: 'أسئلة شائعة عن تأجير السيارات في دبي',
+      items: [
+        {
+          q: 'ما هي أسعار تأجير السيارات في دبي؟',
+          a: 'تختلف الأسعار حسب نوع السيارة ومدة الإيجار. نقدّم خيارات يومية وأسبوعية وشهرية — تواصل معنا عبر واتساب لعرض أفضل عرض حسب احتياجك.',
+        },
+        {
+          q: 'هل تقدمون توصيل لمطار دبي؟',
+          a: 'نعم، نوفر توصيل واستلام لمطار دبي الدولي ومطار آل مكتوم، بالإضافة لمواقع داخل دبي حسب الاتفاق.',
+        },
+        {
+          q: 'ما المستندات المطلوبة لتأجير سيارة؟',
+          a: 'رخصة قيادة سارية، جواز سفر أو هوية إماراتية، وبطاقة للدفع/الضمان. نقبل الرخص الدولية ورخص دول الخليج وفق الأنظمة.',
+        },
+        {
+          q: 'هل السيارات مؤمنة؟',
+          a: 'نعم، سياراتنا مؤمنة تأميناً شاملاً. يمكن طلب تغطيات إضافية عند الحاجة.',
+        },
+        {
+          q: 'هل خدمة العملاء متاحة 24 ساعة؟',
+          a: 'نعم، فريق الدعم متاح على مدار الساعة عبر الهاتف وواتساب للمساعدة والحجوزات.',
+        },
+        {
+          q: 'هل يمكن إلغاء أو تعديل الحجز؟',
+          a: 'نعم، يمكن التعديل أو الإلغاء وفق سياسة الحجز والوقت المتبقي قبل موعد الاستلام.',
+        },
+      ],
     },
     cars: {
       eyebrow: 'الأسطول',
       title: 'سيارات للإيجار في دبي',
-      subtitle: 'اختر من أسطولنا المختار من السيارات الفاخرة والاقتصادية — بأسعار واضحة وخدمة كونسيرج',
-      seoTitle: 'تأجير سيارات في دبي — خيارات متنوعة',
+      subtitle: 'اختر من أسطولنا المختار من السيارات الفاخرة والاقتصادية — خدمة كونسيرج وتوصيل للمطار',
+      seoTitle: 'تأجير سيارات في دبي — يومي وأسبوعي وشهري',
       seoIntro:
-        'تصفح مجموعتنا المتنوعة من السيارات المتاحة للإيجار في دبي. نوفر سيارات فاخرة واقتصادية تناسب جميع الميزانيات، مع خيارات يومي وأسبوعي وشهري، وتأمين شامل.',
+        'تصفح أسطولنا للإيجار في دبي: سيارات فاخرة واقتصادية وعائلية ورياضية، مع توصيل لمطار دبي وتأمين شامل وحجز سريع عبر واتساب.',
+      seoExtra:
+        'مثالي للسياح والمقيمين الباحثين عن تأجير سيارات في دبي مارينا، داون تاون، أو بالقرب من المطار — بأسطول محدّث وخدمة 24/7.',
       typesTitle: 'أنواع السيارات',
       servicesTitle: 'خدماتنا',
       type1: 'سيارات اقتصادية للاستخدام اليومي',
       type2: 'سيارات فاخرة للمناسبات الخاصة',
       type3: 'سيارات عائلية واسعة',
-      type4: 'سيارات رياضية عالية الأداء',
+      type4: 'سيارات رياضية وSUV',
       service1: 'توصيل لمطار دبي',
       service2: 'تأجير يومي وأسبوعي وشهري',
       service3: 'تأمين شامل على جميع السيارات',
@@ -75,6 +110,8 @@ export const translations = {
       diesel: 'ديزل',
       electric: 'كهربائي',
       hybrid: 'هايبرد',
+      seoNote:
+        'احجز هذه السيارة للإيجار في دبي مع توصيل للمطار وخدمة كونسيرج من AL GENERAL CAR RENTAL — يومي أو أسبوعي أو شهري.',
     },
     booking: {
       schedule: 'مواعيد الإيجار',
@@ -198,21 +235,56 @@ export const translations = {
       waDefault: 'WhatsApp Us',
       experienceIntro:
         'AL GENERAL CAR RENTAL is a leading car rental company in Dubai and the UAE. We offer competitive rates, a wide fleet of luxury and everyday cars, airport delivery, and round-the-clock customer support.',
+      localTitle: 'Car rental across Dubai’s key areas',
+      localDesc:
+        'We cover Dubai Airport (DXB), Dubai Marina, Downtown, Business Bay, and Jebel Ali — with flexible daily, weekly, and monthly delivery.',
+    },
+    faq: {
+      eyebrow: 'FAQ',
+      title: 'Frequently asked questions about car rental in Dubai',
+      items: [
+        {
+          q: 'What are car rental prices in Dubai?',
+          a: 'Rates vary by car type and rental length. We offer daily, weekly, and monthly options — WhatsApp us for the best quote for your trip.',
+        },
+        {
+          q: 'Do you deliver to Dubai Airport?',
+          a: 'Yes. We deliver and collect at Dubai International and Al Maktoum airports, plus locations across Dubai by arrangement.',
+        },
+        {
+          q: 'What documents do I need to rent a car?',
+          a: 'A valid driving licence, passport or Emirates ID, and a payment/deposit card. International and GCC licences are accepted as per regulations.',
+        },
+        {
+          q: 'Are the cars insured?',
+          a: 'Yes. Our cars include comprehensive insurance. Extra cover can be arranged if needed.',
+        },
+        {
+          q: 'Is customer support available 24/7?',
+          a: 'Yes. Our team is available around the clock by phone and WhatsApp for help and bookings.',
+        },
+        {
+          q: 'Can I cancel or change a booking?',
+          a: 'Yes. Changes and cancellations follow our booking policy and how close you are to pickup time.',
+        },
+      ],
     },
     cars: {
       eyebrow: 'Fleet',
       title: 'Cars for Rent in Dubai',
       subtitle:
-        'Choose from our curated fleet of luxury and everyday cars — clear pricing and concierge service',
-      seoTitle: 'Car Rental in Dubai — Diverse Options',
+        'Choose from our curated fleet of luxury and everyday cars — concierge service and airport delivery',
+      seoTitle: 'Car Rental in Dubai — Daily, Weekly & Monthly',
       seoIntro:
-        'Browse our diverse fleet available for rent in Dubai. Luxury and economy cars for every budget, with daily, weekly, and monthly options, plus comprehensive insurance.',
+        'Browse our Dubai fleet: luxury, economy, family and sports cars with airport delivery, full insurance, and fast WhatsApp booking.',
+      seoExtra:
+        'Ideal for visitors and residents looking to rent near Dubai Marina, Downtown, or the airport — with an updated fleet and 24/7 support.',
       typesTitle: 'Car Types',
       servicesTitle: 'Our Services',
       type1: 'Economy cars for daily use',
       type2: 'Luxury cars for special occasions',
       type3: 'Spacious family cars',
-      type4: 'High-performance sports cars',
+      type4: 'Sports cars and SUVs',
       service1: 'Dubai Airport delivery',
       service2: 'Daily, weekly, and monthly rental',
       service3: 'Comprehensive insurance on all cars',
@@ -239,6 +311,8 @@ export const translations = {
       diesel: 'Diesel',
       electric: 'Electric',
       hybrid: 'Hybrid',
+      seoNote:
+        'Rent this car in Dubai with airport delivery and concierge service from AL GENERAL CAR RENTAL — daily, weekly, or monthly.',
     },
     booking: {
       schedule: 'Rental Schedule',

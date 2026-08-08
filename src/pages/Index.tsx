@@ -4,15 +4,22 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { HomeLayout } from '@/components/layout/HomeLayout';
-import { getHomeContent, getAvailableCars } from '@/services/firebaseService';
-import { HomeContent, Car as CarType, defaultHomeContent } from '@/types';
+import { getHomeContent, getAvailableCars, getSiteSettings } from '@/services/firebaseService';
+import {
+  HomeContent,
+  Car as CarType,
+  defaultHomeContent,
+  SiteSettings,
+  defaultSiteSettings,
+} from '@/types';
 import { CarCard } from '@/components/cars/CarCard';
 import { useSEO } from '@/hooks/useSEO';
-import { seoContent, getCanonicalUrl } from '@/utils/seoHelpers';
+import { getPageSeo, getCanonicalUrl } from '@/utils/seoHelpers';
 import { SchemaOrganization } from '@/components/seo/SchemaOrganization';
 import { SchemaLocalBusiness } from '@/components/seo/SchemaLocalBusiness';
 import { SchemaBreadcrumb } from '@/components/seo/SchemaBreadcrumb';
 import { SchemaFAQ } from '@/components/seo/SchemaFAQ';
+import { FaqSection } from '@/components/home/FaqSection';
 import { useLanguage } from '@/contexts/LanguageContext';
 import hero1 from '@/assets/hero-1.jpg';
 import hero2 from '@/assets/hero-2.jpg';
@@ -23,34 +30,33 @@ const HERO_INTERVAL_MS = 3000;
 
 const Index = () => {
   const [homeContent, setHomeContent] = useState<HomeContent>(defaultHomeContent);
+  const [siteSettings, setSiteSettings] = useState<SiteSettings>(defaultSiteSettings);
   const [allCars, setAllCars] = useState<CarType[]>([]);
   const [loading, setLoading] = useState(true);
   const [heroIndex, setHeroIndex] = useState(0);
   const { t, lang, isRTL } = useLanguage();
+  const pageSeo = getPageSeo('home', lang);
 
   useSEO({
-    title:
-      lang === 'ar'
-        ? seoContent.home.title
-        : 'Luxury Car Rental in Dubai | AL GENERAL CAR RENTAL',
-    description:
-      lang === 'ar'
-        ? seoContent.home.description
-        : 'AL GENERAL luxury car rental in Dubai. Daily, weekly, and monthly hire with airport delivery and 24/7 support.',
-    keywords: seoContent.home.keywords,
+    title: pageSeo.title,
+    description: pageSeo.description,
+    keywords: pageSeo.keywords,
     canonical: getCanonicalUrl('/'),
     ogImage: 'https://algenral.vercel.app/logo.png',
+    lang,
   });
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [content, cars] = await Promise.all([
+        const [content, cars, settings] = await Promise.all([
           getHomeContent().catch(() => defaultHomeContent),
           getAvailableCars().catch(() => []),
+          getSiteSettings().catch(() => defaultSiteSettings),
         ]);
         setHomeContent(content);
         setAllCars(cars);
+        setSiteSettings({ ...defaultSiteSettings, ...settings });
       } catch (error) {
         console.error('Error fetching home data:', error);
         setHomeContent(defaultHomeContent);
@@ -73,6 +79,10 @@ const Index = () => {
     return () => window.clearInterval(id);
   }, [useVideo]);
 
+  const headline =
+    lang === 'ar'
+      ? homeContent.mainTitle || t.home.headline
+      : t.home.headline;
   const subtitle =
     lang === 'ar'
       ? homeContent.subtitle || t.home.fallbackSubtitle
@@ -85,8 +95,8 @@ const Index = () => {
 
   return (
     <HomeLayout showFooter={true}>
-      <SchemaOrganization />
-      <SchemaLocalBusiness />
+      <SchemaOrganization settings={siteSettings} />
+      <SchemaLocalBusiness settings={siteSettings} />
       <SchemaFAQ />
       <SchemaBreadcrumb items={[{ name: t.nav.home, url: '/' }]} />
 
@@ -145,7 +155,7 @@ const Index = () => {
             <div className="luxury-divider mx-0 w-16 sm:w-20 bg-gradient-to-l from-transparent via-primary to-primary" />
 
             <h1 className="text-xl sm:text-3xl md:text-4xl font-bold text-white leading-snug text-balance drop-shadow-[0_2px_12px_rgba(0,0,0,0.6)]">
-              {t.home.headline}
+              {headline}
             </h1>
 
             <p className="text-sm sm:text-base md:text-lg text-white/90 max-w-xl leading-relaxed drop-shadow-[0_1px_8px_rgba(0,0,0,0.55)]">
@@ -263,7 +273,9 @@ const Index = () => {
             <h2 className="text-3xl md:text-4xl font-bold text-white text-balance">
               {t.home.experienceTitle}
             </h2>
-            <p className="text-white/65 text-lg leading-relaxed">{t.home.experienceIntro}</p>
+            <p className="text-white/65 text-base sm:text-lg leading-relaxed">
+              {t.home.experienceIntro}
+            </p>
             <div className="grid sm:grid-cols-3 gap-8 pt-8 text-start sm:text-center">
               {[
                 { title: t.home.feature1Title, desc: t.home.feature1Desc },
@@ -277,9 +289,17 @@ const Index = () => {
                 </div>
               ))}
             </div>
+            <div className="pt-6 border-t border-white/10 text-center space-y-2">
+              <h3 className="font-semibold text-white text-lg">{t.home.localTitle}</h3>
+              <p className="text-sm text-white/55 leading-relaxed max-w-2xl mx-auto">
+                {t.home.localDesc}
+              </p>
+            </div>
           </motion.div>
         </div>
       </section>
+
+      <FaqSection />
     </HomeLayout>
   );
 };

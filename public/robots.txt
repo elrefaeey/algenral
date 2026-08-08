@@ -3,8 +3,4 @@ Allow: /
 Disallow: /admin
 Disallow: /admin-login
 
-# Sitemap
 Sitemap: https://algenral.vercel.app/sitemap.xml
-
-# Crawl-delay for better server performance
-Crawl-delay: 1

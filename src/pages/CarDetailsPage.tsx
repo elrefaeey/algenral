@@ -34,6 +34,7 @@ const CarDetailsPage = () => {
   const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState(0);
   const [paused, setPaused] = useState(false);
+  const [isLandscape, setIsLandscape] = useState(false);
   const { t, lang, isRTL } = useLanguage();
 
   const fuelTypeLabels = {
@@ -50,24 +51,23 @@ const CarDetailsPage = () => {
 
   useSEO({
     title: car
-      ? lang === 'ar'
-        ? generateCarTitle(car)
-        : `Rent ${car.name} in Dubai | AL GENERAL CAR RENTAL`
+      ? generateCarTitle(car, lang)
       : lang === 'ar'
         ? 'تفاصيل السيارة | AL GENERAL CAR RENTAL'
         : 'Car Details | AL GENERAL CAR RENTAL',
     description: car
-      ? lang === 'ar'
-        ? generateCarDescription(car)
-        : `Rent ${car.name} in Dubai. ${car.description || ''} Airport delivery and 24/7 support.`
+      ? generateCarDescription(car, lang)
       : lang === 'ar'
         ? 'تفاصيل السيارة للإيجار في دبي'
         : 'Car rental details in Dubai',
-    keywords: car ? generateCarKeywords(car) : 'تأجير سيارات دبي',
+    keywords: car ? generateCarKeywords(car, lang) : 'تأجير سيارات دبي, car rental dubai',
     canonical: getCanonicalUrl(`/cars/${id}`),
     ogImage: car?.images?.[0]
-      ? `https://algenral.vercel.app${car.images[0]}`
+      ? car.images[0].startsWith('http')
+        ? car.images[0]
+        : `https://algenral.vercel.app${car.images[0]}`
       : 'https://algenral.vercel.app/logo.png',
+    lang,
   });
 
   useEffect(() => {
@@ -161,27 +161,42 @@ const CarDetailsPage = () => {
         onMouseLeave={() => setPaused(false)}
       >
         <div className="section-container pt-4 sm:pt-6 md:pt-8 pb-2">
-          <div className="mx-auto w-full max-w-xl sm:max-w-2xl md:max-w-3xl lg:max-w-4xl">
-            <div className="mx-auto flex w-fit max-w-full items-center gap-2">
+          <div
+            className={`mx-auto w-full ${
+              isLandscape
+                ? 'max-w-2xl sm:max-w-3xl md:max-w-4xl lg:max-w-5xl'
+                : 'max-w-xl sm:max-w-2xl md:max-w-3xl'
+            }`}
+          >
+            {/* Arrows always outside the image */}
+            <div className="mx-auto flex w-full max-w-full items-center justify-center gap-2 sm:gap-3">
               {images.length > 1 && (
                 <button
                   type="button"
                   onClick={goPrev}
-                  className="hidden sm:flex flex-shrink-0 w-9 h-9 bg-background text-foreground shadow-soft hover:bg-muted transition-all items-center justify-center"
+                  className="flex-shrink-0 w-9 h-9 sm:w-10 sm:h-10 bg-background text-foreground shadow-soft hover:bg-muted transition-all touch-manipulation flex items-center justify-center"
                   aria-label="Previous"
                 >
                   <PrevIcon className="w-4 h-4" />
                 </button>
               )}
 
-              <div className="relative min-w-0 max-w-full">
+              <div className="min-w-0 flex-1 flex justify-center">
                 {images.length > 0 ? (
                   <AnimatePresence mode="wait">
                     <motion.img
                       key={selectedImage}
                       src={images[selectedImage]}
                       alt={`${title} - ${selectedImage + 1}`}
-                      className="block max-w-full w-auto h-auto max-h-[55svh] sm:max-h-[380px] md:max-h-[440px] lg:max-h-[500px] object-contain"
+                      onLoad={(e) => {
+                        const img = e.currentTarget;
+                        setIsLandscape(img.naturalWidth > img.naturalHeight);
+                      }}
+                      className={`block max-w-full w-auto h-auto object-contain ${
+                        isLandscape
+                          ? 'max-h-[42svh] sm:max-h-[420px] md:max-h-[480px] lg:max-h-[540px]'
+                          : 'max-h-[55svh] sm:max-h-[360px] md:max-h-[420px] lg:max-h-[480px]'
+                      }`}
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
@@ -193,34 +208,13 @@ const CarDetailsPage = () => {
                     <Settings className="w-14 h-14 text-muted-foreground/30" />
                   </div>
                 )}
-
-                {images.length > 1 && (
-                  <>
-                    <button
-                      type="button"
-                      onClick={goPrev}
-                      className="sm:hidden absolute top-1/2 start-1 -translate-y-1/2 z-10 w-9 h-9 bg-background/90 text-foreground shadow-soft touch-manipulation flex items-center justify-center"
-                      aria-label="Previous"
-                    >
-                      <PrevIcon className="w-4 h-4" />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={goNext}
-                      className="sm:hidden absolute top-1/2 end-1 -translate-y-1/2 z-10 w-9 h-9 bg-background/90 text-foreground shadow-soft touch-manipulation flex items-center justify-center"
-                      aria-label="Next"
-                    >
-                      <NextIcon className="w-4 h-4" />
-                    </button>
-                  </>
-                )}
               </div>
 
               {images.length > 1 && (
                 <button
                   type="button"
                   onClick={goNext}
-                  className="hidden sm:flex flex-shrink-0 w-9 h-9 bg-background text-foreground shadow-soft hover:bg-muted transition-all items-center justify-center"
+                  className="flex-shrink-0 w-9 h-9 sm:w-10 sm:h-10 bg-background text-foreground shadow-soft hover:bg-muted transition-all touch-manipulation flex items-center justify-center"
                   aria-label="Next"
                 >
                   <NextIcon className="w-4 h-4" />
@@ -324,12 +318,19 @@ const CarDetailsPage = () => {
               ))}
             </div>
 
-            {description && (
+            {(description || t.car.seoNote) && (
               <div className="mt-8 sm:mt-10 md:mt-12 text-center max-w-2xl mx-auto">
-                <p className="section-eyebrow mb-3">{t.car.description}</p>
-                <div className="luxury-divider mb-4 sm:mb-6" />
-                <p className="text-muted-foreground text-sm sm:text-base md:text-[1.05rem] leading-[1.85] text-balance px-1">
-                  {description}
+                {description && (
+                  <>
+                    <p className="section-eyebrow mb-3">{t.car.description}</p>
+                    <div className="luxury-divider mb-4 sm:mb-6" />
+                    <p className="text-muted-foreground text-sm sm:text-base md:text-[1.05rem] leading-[1.85] text-balance px-1">
+                      {description}
+                    </p>
+                  </>
+                )}
+                <p className="text-muted-foreground/90 text-sm leading-relaxed mt-5 px-1">
+                  {t.car.seoNote}
                 </p>
               </div>
             )}
