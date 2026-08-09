@@ -2,7 +2,6 @@ import { initializeApp } from "firebase/app";
 import { getAnalytics, isSupported } from "firebase/analytics";
 import { getAuth } from "firebase/auth";
 import { getFirestore, enableNetwork, disableNetwork } from "firebase/firestore";
-import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCJe1ce-903bEiy1uTxMPDXnHvr2SArqSg",
@@ -18,7 +17,6 @@ export const app = initializeApp(firebaseConfig);
 export const analytics = isSupported().then(yes => yes ? getAnalytics(app) : null);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
-export const storage = getStorage(app);
 
 // Handle network connectivity
 export const handleNetworkError = async () => {

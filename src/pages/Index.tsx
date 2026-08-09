@@ -4,17 +4,23 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { HomeLayout } from '@/components/layout/HomeLayout';
-import { getHomeContent, getAvailableCars, getSiteSettings } from '@/services/firebaseService';
+import {
+  getHomeContent,
+  getAvailableCars,
+  getSiteSettings,
+  getPublishedBlogPosts,
+} from '@/services/firebaseService';
 import {
   HomeContent,
   Car as CarType,
+  BlogPost,
   defaultHomeContent,
   SiteSettings,
   defaultSiteSettings,
 } from '@/types';
 import { CarCard } from '@/components/cars/CarCard';
 import { useSEO } from '@/hooks/useSEO';
-import { getPageSeo, getCanonicalUrl } from '@/utils/seoHelpers';
+import { getPageSeo, getCanonicalUrl, getBlogPath } from '@/utils/seoHelpers';
 import { SchemaOrganization } from '@/components/seo/SchemaOrganization';
 import { SchemaLocalBusiness } from '@/components/seo/SchemaLocalBusiness';
 import { SchemaBreadcrumb } from '@/components/seo/SchemaBreadcrumb';
@@ -32,6 +38,7 @@ const Index = () => {
   const [homeContent, setHomeContent] = useState<HomeContent>(defaultHomeContent);
   const [siteSettings, setSiteSettings] = useState<SiteSettings>(defaultSiteSettings);
   const [allCars, setAllCars] = useState<CarType[]>([]);
+  const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [heroIndex, setHeroIndex] = useState(0);
   const { t, lang, isRTL } = useLanguage();
@@ -49,14 +56,16 @@ const Index = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [content, cars, settings] = await Promise.all([
+        const [content, cars, settings, posts] = await Promise.all([
           getHomeContent().catch(() => defaultHomeContent),
           getAvailableCars().catch(() => []),
           getSiteSettings().catch(() => defaultSiteSettings),
+          getPublishedBlogPosts().catch(() => []),
         ]);
         setHomeContent(content);
         setAllCars(cars);
         setSiteSettings({ ...defaultSiteSettings, ...settings });
+        setBlogPosts(posts.slice(0, 3));
       } catch (error) {
         console.error('Error fetching home data:', error);
         setHomeContent(defaultHomeContent);
@@ -140,7 +149,7 @@ const Index = () => {
               className="pointer-events-none absolute -inset-3 sm:-inset-8 -z-10 rounded-2xl"
               style={{
                 background:
-                  'radial-gradient(ellipse at center, hsl(210 28% 8% / 0.5), transparent 70%)',
+                  'radial-gradient(ellipse at center, hsl(var(--ink) / 0.55), transparent 70%)',
               }}
             />
             <div className="space-y-2 sm:space-y-3">
@@ -228,9 +237,9 @@ const Index = () => {
           </motion.div>
 
           {loading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-7">
               {[...Array(3)].map((_, i) => (
-                <div key={i} className="aspect-[4/5] bg-muted animate-pulse rounded-md" />
+                <div key={i} className="aspect-[4/5] bg-muted animate-pulse" />
               ))}
             </div>
           ) : allCars.length > 0 ? (
@@ -259,7 +268,7 @@ const Index = () => {
           className="absolute inset-0 opacity-50"
           style={{
             background:
-              'radial-gradient(ellipse 70% 80% at 10% 50%, hsl(36 42% 46% / 0.2), transparent)',
+              'radial-gradient(ellipse 70% 80% at 10% 50%, hsl(var(--primary) / 0.22), transparent)',
           }}
         />
         <div className="section-container relative">
@@ -298,6 +307,47 @@ const Index = () => {
           </motion.div>
         </div>
       </section>
+
+      {blogPosts.length > 0 && (
+        <section className="py-12 sm:py-16 md:py-20 border-t border-border/50">
+          <div className="section-container">
+            <div className="mb-8 sm:mb-10 max-w-2xl">
+              <p className="section-eyebrow mb-2">{t.blog.eyebrow}</p>
+              <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">
+                {t.blog.title}
+              </h2>
+              <p className="text-muted-foreground">{t.blog.subtitle}</p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6">
+              {blogPosts.map((post) => {
+                const title = lang === 'ar' ? post.titleAr : post.title;
+                const excerpt = lang === 'ar' ? post.excerptAr : post.excerpt;
+                return (
+                  <Link
+                    key={post.id}
+                    to={getBlogPath(post)}
+                    className="group block border border-border/50 bg-card p-5 transition-all duration-300 hover:border-primary/35 hover:shadow-soft"
+                  >
+                    <h3 className="font-bold text-foreground group-hover:text-primary transition-colors mb-2 leading-snug">
+                      {title}
+                    </h3>
+                    <p className="text-sm text-muted-foreground line-clamp-3 mb-3">{excerpt}</p>
+                    <span className="text-sm font-semibold text-primary inline-flex items-center gap-1">
+                      {t.blog.readMore}
+                      <ChevronLeft className="w-4 h-4 ltr:rotate-180" />
+                    </span>
+                  </Link>
+                );
+              })}
+            </div>
+            <div className="mt-8 text-center">
+              <Button asChild variant="outline" className="btn-outline-gold rounded-md px-8">
+                <Link to="/blog">{t.nav.blog}</Link>
+              </Button>
+            </div>
+          </div>
+        </section>
+      )}
 
       <FaqSection />
     </HomeLayout>

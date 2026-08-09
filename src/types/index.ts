@@ -90,3 +90,25 @@ export const defaultSiteSettings: SiteSettings = {
   addressAr: 'مكتب 302، هور العنز شرق - دبي - الإمارات',
   licenseNumber: '1175479',
 };
+
+export interface BlogPost {
+  id: string;
+  slug: string;
+  title: string;
+  titleAr: string;
+  excerpt: string;
+  excerptAr: string;
+  content: string;
+  contentAr: string;
+  coverImage: string;
+  metaTitle?: string;
+  metaTitleAr?: string;
+  metaDescription?: string;
+  metaDescriptionAr?: string;
+  keywords?: string;
+  keywordsAr?: string;
+  published: boolean;
+  publishedAt?: Date;
+  createdAt: Date;
+  updatedAt: Date;
+}

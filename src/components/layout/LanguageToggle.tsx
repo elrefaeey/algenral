@@ -12,7 +12,7 @@ export const LanguageToggle = () => {
       aria-label="Language switcher"
     >
       <span
-        className={`pointer-events-none absolute top-0.5 h-7 w-7 sm:h-8 sm:w-8 rounded-full bg-[#0B1B2B] shadow-sm transition-transform duration-300 ease-out ${
+        className={`pointer-events-none absolute top-0.5 h-7 w-7 sm:h-8 sm:w-8 rounded-full bg-ink shadow-sm transition-transform duration-300 ease-out ${
           isArabic ? 'translate-x-7 sm:translate-x-8' : 'translate-x-0'
         }`}
         style={{ left: 2 }}

@@ -12,14 +12,16 @@ import {
   Timestamp,
   setDoc,
 } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 import {
-  ref,
-  uploadBytes,
-  getDownloadURL,
-  deleteObject,
-} from 'firebase/storage';
-import { db, storage } from '@/lib/firebase';
-import { Car, Booking, HomeContent, SiteSettings, defaultHomeContent, defaultSiteSettings } from '@/types';
+  Car,
+  Booking,
+  HomeContent,
+  SiteSettings,
+  BlogPost,
+  defaultHomeContent,
+  defaultSiteSettings,
+} from '@/types';
 
 // Cars
 export const getCars = async (): Promise<Car[]> => {
@@ -255,14 +257,105 @@ export const updateSiteSettings = async (settings: Partial<SiteSettings>): Promi
   await setDoc(settingsRef, settings, { merge: true });
 };
 
-// Storage
-export const uploadImage = async (file: File, path: string): Promise<string> => {
-  const storageRef = ref(storage, path);
-  await uploadBytes(storageRef, file);
-  return getDownloadURL(storageRef);
+// Blog
+const mapBlogPost = (id: string, data: Record<string, unknown>): BlogPost =>
+  ({
+    id,
+    ...data,
+    publishedAt: (data.publishedAt as { toDate?: () => Date })?.toDate?.() || undefined,
+    createdAt: (data.createdAt as { toDate?: () => Date })?.toDate?.() || new Date(),
+    updatedAt: (data.updatedAt as { toDate?: () => Date })?.toDate?.() || new Date(),
+  }) as BlogPost;
+
+export const getBlogPosts = async (): Promise<BlogPost[]> => {
+  try {
+    const refCol = collection(db, 'blogPosts');
+    const snapshot = await getDocs(refCol);
+    const posts = snapshot.docs.map((d) => mapBlogPost(d.id, d.data() as Record<string, unknown>));
+    return posts.sort((a, b) => {
+      const da = a.publishedAt?.getTime() || a.createdAt?.getTime() || 0;
+      const db_ = b.publishedAt?.getTime() || b.createdAt?.getTime() || 0;
+      return db_ - da;
+    });
+  } catch (error) {
+    console.warn('Failed to fetch blog posts:', error);
+    return [];
+  }
 };
 
-export const deleteImage = async (path: string): Promise<void> => {
-  const storageRef = ref(storage, path);
-  await deleteObject(storageRef);
+export const getPublishedBlogPosts = async (): Promise<BlogPost[]> => {
+  try {
+    const refCol = collection(db, 'blogPosts');
+    const q = query(refCol, where('published', '==', true));
+    const snapshot = await getDocs(q);
+    const posts = snapshot.docs.map((d) => mapBlogPost(d.id, d.data() as Record<string, unknown>));
+    return posts.sort((a, b) => {
+      const da = a.publishedAt?.getTime() || a.createdAt?.getTime() || 0;
+      const db_ = b.publishedAt?.getTime() || b.createdAt?.getTime() || 0;
+      return db_ - da;
+    });
+  } catch (error) {
+    console.warn('Failed to fetch published blog posts:', error);
+    return [];
+  }
+};
+
+export const getBlogPostBySlug = async (slug: string): Promise<BlogPost | null> => {
+  try {
+    const refCol = collection(db, 'blogPosts');
+    const q = query(refCol, where('slug', '==', slug));
+    const snapshot = await getDocs(q);
+    if (snapshot.empty) return null;
+    const d = snapshot.docs[0];
+    return mapBlogPost(d.id, d.data() as Record<string, unknown>);
+  } catch (error) {
+    console.warn('Failed to fetch blog post by slug:', error);
+    return null;
+  }
+};
+
+export const getBlogPost = async (id: string): Promise<BlogPost | null> => {
+  const postRef = doc(db, 'blogPosts', id);
+  const snapshot = await getDoc(postRef);
+  if (!snapshot.exists()) return null;
+  return mapBlogPost(snapshot.id, snapshot.data() as Record<string, unknown>);
+};
+
+export const addBlogPost = async (
+  post: Omit<BlogPost, 'id' | 'createdAt' | 'updatedAt'>
+): Promise<string> => {
+  const refCol = collection(db, 'blogPosts');
+  const payload: Record<string, unknown> = {
+    ...post,
+    createdAt: Timestamp.now(),
+    updatedAt: Timestamp.now(),
+  };
+  if (post.publishedAt) {
+    payload.publishedAt = Timestamp.fromDate(post.publishedAt);
+  } else if (post.published) {
+    payload.publishedAt = Timestamp.now();
+  }
+  const docRef = await addDoc(refCol, payload);
+  return docRef.id;
+};
+
+export const updateBlogPost = async (id: string, post: Partial<BlogPost>): Promise<void> => {
+  const postRef = doc(db, 'blogPosts', id);
+  const payload: Record<string, unknown> = {
+    ...post,
+    updatedAt: Timestamp.now(),
+  };
+  delete payload.id;
+  delete payload.createdAt;
+  if (post.publishedAt instanceof Date) {
+    payload.publishedAt = Timestamp.fromDate(post.publishedAt);
+  }
+  if (post.published === true && !post.publishedAt) {
+    payload.publishedAt = Timestamp.now();
+  }
+  await updateDoc(postRef, payload);
+};
+
+export const deleteBlogPost = async (id: string): Promise<void> => {
+  await deleteDoc(doc(db, 'blogPosts', id));
 };

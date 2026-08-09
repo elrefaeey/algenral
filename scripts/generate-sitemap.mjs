@@ -1,5 +1,5 @@
 /**
- * Generates public/sitemap.xml including static pages + all car detail URLs from Firestore.
+ * Generates public/sitemap.xml including static pages + cars + published blog posts.
  * Falls back to static pages only if Firebase is unavailable.
  *
  * Usage: node scripts/generate-sitemap.mjs
@@ -28,6 +28,7 @@ const today = new Date().toISOString().slice(0, 10);
 const staticPages = [
   { path: '/', changefreq: 'daily', priority: '1.0' },
   { path: '/cars', changefreq: 'daily', priority: '0.9' },
+  { path: '/blog', changefreq: 'weekly', priority: '0.85' },
   { path: '/about', changefreq: 'monthly', priority: '0.7' },
   { path: '/contact', changefreq: 'monthly', priority: '0.8' },
 ];
@@ -44,34 +45,56 @@ function urlEntry(loc, lastmod, changefreq, priority) {
   </url>`;
 }
 
-async function fetchCarIds() {
+async function fetchDynamicUrls() {
   try {
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    const snapshot = await getDocs(collection(db, 'cars'));
-    return snapshot.docs.map((docSnap) => {
+
+    const [carsSnap, postsSnap] = await Promise.all([
+      getDocs(collection(db, 'cars')),
+      getDocs(collection(db, 'blogPosts')),
+    ]);
+
+    const cars = carsSnap.docs.map((docSnap) => {
       const data = docSnap.data();
       const updated = data.updatedAt?.toDate?.() || data.createdAt?.toDate?.();
       const lastmod = updated ? updated.toISOString().slice(0, 10) : today;
-      // Use Firestore document id so /cars/:id routes always resolve
       return { id: docSnap.id, lastmod };
     });
+
+    const posts = postsSnap.docs
+      .map((docSnap) => {
+        const data = docSnap.data();
+        if (!data.published) return null;
+        const slug = (data.slug || docSnap.id || '').toString().trim();
+        if (!slug) return null;
+        const updated =
+          data.updatedAt?.toDate?.() ||
+          data.publishedAt?.toDate?.() ||
+          data.createdAt?.toDate?.();
+        const lastmod = updated ? updated.toISOString().slice(0, 10) : today;
+        return { slug, lastmod };
+      })
+      .filter(Boolean);
+
+    return { cars, posts };
   } catch (error) {
-    console.warn('Sitemap: could not fetch cars from Firebase — using static pages only.');
+    console.warn('Sitemap: could not fetch from Firebase — using static pages only.');
     console.warn(error?.message || error);
-    return [];
+    return { cars: [], posts: [] };
   }
 }
 
 async function main() {
-  const cars = await fetchCarIds();
+  const { cars, posts } = await fetchDynamicUrls();
 
   const entries = [
     ...staticPages.map((p) =>
       urlEntry(`${SITE}${p.path === '/' ? '/' : p.path}`, today, p.changefreq, p.priority)
     ),
-    ...cars.map((car) =>
-      urlEntry(`${SITE}/cars/${car.id}`, car.lastmod, 'weekly', '0.8')
+    ...cars.map((car) => urlEntry(`${SITE}/cars/${car.id}`, car.lastmod, 'weekly', '0.8')),
+    ...posts.map((post) =>
+      urlEntry(`${SITE}/blog/${post.slug}`, post.lastmod, 'weekly', '0.75')
     ),
   ];
 
@@ -84,7 +107,9 @@ ${entries.join('\n')}
 
   const outPath = resolve(root, 'public/sitemap.xml');
   writeFileSync(outPath, xml, 'utf8');
-  console.log(`Sitemap written: ${outPath} (${staticPages.length} static + ${cars.length} cars)`);
+  console.log(
+    `Sitemap written: ${outPath} (${staticPages.length} static + ${cars.length} cars + ${posts.length} posts)`
+  );
 }
 
 main();

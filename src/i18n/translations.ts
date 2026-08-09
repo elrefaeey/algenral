@@ -5,6 +5,7 @@ export const translations = {
     nav: {
       home: 'الرئيسية',
       cars: 'السيارات',
+      blog: 'المدونة',
       about: 'من نحن',
       contact: 'تواصل معنا',
       bookNow: 'احجز الآن',
@@ -88,6 +89,16 @@ export const translations = {
       service2: 'تأجير يومي وأسبوعي وشهري',
       service3: 'تأمين شامل على جميع السيارات',
       service4: 'خدمة عملاء 24 ساعة',
+    },
+    blog: {
+      eyebrow: 'المدونة',
+      title: 'مدونة تأجير السيارات في دبي',
+      subtitle:
+        'نصائح وأدلة عملية عن تأجير السيارات في دبي — المطار، الأسعار، وأفضل مناطق القيادة',
+      readMore: 'اقرأ المزيد',
+      empty: 'لا توجد مقالات منشورة حاليًا — عد قريبًا',
+      notFound: 'المقال غير موجود',
+      back: 'العودة للمدونة',
     },
     car: {
       available: 'متاحة',
@@ -204,6 +215,7 @@ export const translations = {
     nav: {
       home: 'Home',
       cars: 'Cars',
+      blog: 'Blog',
       about: 'About',
       contact: 'Contact',
       bookNow: 'Book Now',
@@ -289,6 +301,16 @@ export const translations = {
       service2: 'Daily, weekly, and monthly rental',
       service3: 'Comprehensive insurance on all cars',
       service4: '24-hour customer support',
+    },
+    blog: {
+      eyebrow: 'Blog',
+      title: 'Dubai Car Rental Blog',
+      subtitle:
+        'Practical guides on renting a car in Dubai — airport pickup, pricing, and the best areas to drive',
+      readMore: 'Read more',
+      empty: 'No published articles yet — check back soon',
+      notFound: 'Article not found',
+      back: 'Back to blog',
     },
     car: {
       available: 'Available',

@@ -5,7 +5,6 @@ import {
   Pencil,
   Trash2,
   Loader2,
-  X,
   Car as CarIcon,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -38,6 +37,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Car } from '@/types';
 import { addCar, updateCar, deleteCar } from '@/services/firebaseService';
+import { ImageUploader } from '@/components/admin/ImageUploader';
 import { toast } from 'sonner';
 
 interface AdminCarsProps {
@@ -83,7 +83,6 @@ export const AdminCars = ({ cars, onRefresh, loading }: AdminCarsProps) => {
   const [carToDelete, setCarToDelete] = useState<Car | null>(null);
   const [formData, setFormData] = useState<CarForm>(initialCarState);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [imageUrl, setImageUrl] = useState('');
 
   const handleOpenDialog = (car?: Car) => {
     if (car) {
@@ -116,30 +115,6 @@ export const AdminCars = ({ cars, onRefresh, loading }: AdminCarsProps) => {
       setFormData(initialCarState);
     }
     setIsDialogOpen(true);
-  };
-
-  const addImageUrl = () => {
-    const trimmed = imageUrl.trim();
-    if (!trimmed) {
-      toast.error('يرجى إدخال رابط صورة صالح');
-      return;
-    }
-
-    setFormData((prev) => ({
-      ...prev,
-      images: [...prev.images, trimmed],
-      imageAlts: [...(prev.imageAlts || []), ''],
-    }));
-    setImageUrl('');
-    toast.success('تم إضافة رابط الصورة');
-  };
-
-  const removeImage = (index: number) => {
-    setFormData((prev) => ({
-      ...prev,
-      images: prev.images.filter((_, i) => i !== index),
-      imageAlts: (prev.imageAlts || []).filter((_, i) => i !== index),
-    }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -338,36 +313,21 @@ export const AdminCars = ({ cars, onRefresh, loading }: AdminCarsProps) => {
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <SectionTitle>الصور</SectionTitle>
-            <div className="space-y-3">
-              <div className="flex flex-wrap gap-3">
-                {formData.images.map((url, index) => (
-                  <div
-                    key={`${url}-${index}`}
-                    className="relative w-24 h-24 rounded-md overflow-hidden group border border-border/50"
-                  >
-                    <img src={url} alt="" className="w-full h-full object-cover" />
-                    <button
-                      type="button"
-                      onClick={() => removeImage(index)}
-                      className="absolute inset-0 bg-ink/50 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity"
-                    >
-                      <X className="w-5 h-5 text-white" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-              <div className="flex gap-2">
-                <Input
-                  value={imageUrl}
-                  onChange={(e) => setImageUrl(e.target.value)}
-                  placeholder="ضع رابط الصورة ثم اضغط إضافة"
-                  className="rounded-md"
-                />
-                <Button type="button" variant="outline" onClick={addImageUrl} className="rounded-md">
-                  إضافة
-                </Button>
-              </div>
-            </div>
+            <ImageUploader
+              multiple
+              maxFiles={6}
+              value={formData.images}
+              label="رفع صور السيارة من الجهاز"
+              hint="الصورة تتضغط وتتحفظ مع بيانات السيارة في Firestore (بدون Storage)"
+              onChange={(next) => {
+                const images = Array.isArray(next) ? next : next ? [next] : [];
+                setFormData((prev) => ({
+                  ...prev,
+                  images,
+                  imageAlts: images.map((_, i) => prev.imageAlts?.[i] || ''),
+                }));
+              }}
+            />
 
             <SectionTitle>البيانات الأساسية</SectionTitle>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

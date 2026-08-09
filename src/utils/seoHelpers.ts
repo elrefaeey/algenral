@@ -1,4 +1,4 @@
-import { Car } from '@/types';
+import { BlogPost, Car } from '@/types';
 import type { Lang } from '@/i18n/translations';
 
 export const SITE_URL = 'https://algenral.vercel.app';
@@ -23,7 +23,7 @@ export const formatPrice = (price: number): string => {
   }).format(price);
 };
 
-type PageKey = 'home' | 'cars' | 'about' | 'contact';
+type PageKey = 'home' | 'cars' | 'about' | 'contact' | 'blog';
 
 type LocalizedSeo = {
   title: string;
@@ -66,6 +66,15 @@ export const seoContent: Record<Lang, Record<PageKey, LocalizedSeo>> = {
       keywords:
         'تواصل معنا, تأجير سيارات دبي واتساب, خدمة عملاء تأجير سيارات, contact car rental dubai',
     },
+    blog: {
+      title: 'مدونة تأجير السيارات في دبي | AL GENERAL',
+      description:
+        'مقالات ونصائح عن تأجير السيارات في دبي: مطار دبي، الأسعار، التأمين، وأفضل المناطق للقيادة — من خبراء الچينرال.',
+      keywords:
+        'مدونة تأجير سيارات دبي, نصائح تأجير سيارات دبي, أسعار تأجير سيارات دبي, car rental dubai blog',
+      intro:
+        'اقرأ أحدث المقالات عن تأجير السيارات في دبي واختر السيارة المناسبة لرحلتك مع AL GENERAL CAR RENTAL.',
+    },
   },
   en: {
     home: {
@@ -99,6 +108,15 @@ export const seoContent: Record<Lang, Record<PageKey, LocalizedSeo>> = {
         'Contact AL GENERAL in Dubai — WhatsApp & phone 24/7, Office 302 Hoor Al Anz East, Dubai Airport delivery.',
       keywords:
         'contact car rental dubai, dubai car hire whatsapp, AL GENERAL contact',
+    },
+    blog: {
+      title: 'Dubai Car Rental Blog | AL GENERAL',
+      description:
+        'Guides and tips on car rental in Dubai: airport pickup, pricing, insurance, and where to drive — from AL GENERAL experts.',
+      keywords:
+        'dubai car rental blog, rent a car dubai tips, dubai airport car rental guide, car hire dubai advice',
+      intro:
+        'Read the latest Dubai car rental guides and pick the right vehicle for your trip with AL GENERAL CAR RENTAL.',
     },
   },
 };
@@ -150,4 +168,57 @@ export const generateCarKeywords = (car: Car, lang: Lang = 'ar'): string => {
 export const getCarPath = (car: Car): string => {
   if (car.slug?.trim()) return `/cars/${car.slug.trim()}`;
   return `/cars/${car.id}`;
+};
+
+export const slugify = (text: string): string => {
+  return text
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\u0600-\u06FF\s-]/g, '')
+    .replace(/[\s_]+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '')
+    .slice(0, 90);
+};
+
+export const getBlogPath = (post: Pick<BlogPost, 'slug' | 'id'>): string => {
+  if (post.slug?.trim()) return `/blog/${post.slug.trim()}`;
+  return `/blog/${post.id}`;
+};
+
+export const generateBlogTitle = (post: BlogPost, lang: Lang = 'ar'): string => {
+  if (lang === 'ar') {
+    return post.metaTitleAr?.trim() || `${post.titleAr} | مدونة الچينرال`;
+  }
+  return post.metaTitle?.trim() || `${post.title} | AL GENERAL Blog`;
+};
+
+export const generateBlogDescription = (post: BlogPost, lang: Lang = 'ar'): string => {
+  if (lang === 'ar') {
+    return (
+      post.metaDescriptionAr?.trim() ||
+      post.excerptAr?.trim() ||
+      post.contentAr?.slice(0, 155) ||
+      post.excerpt ||
+      ''
+    );
+  }
+  return (
+    post.metaDescription?.trim() ||
+    post.excerpt?.trim() ||
+    post.content?.slice(0, 155) ||
+    post.excerptAr ||
+    ''
+  );
+};
+
+export const generateBlogKeywords = (post: BlogPost, lang: Lang = 'ar'): string => {
+  if (lang === 'ar' && post.keywordsAr?.trim()) return post.keywordsAr.trim();
+  if (lang === 'en' && post.keywords?.trim()) return post.keywords.trim();
+  const base =
+    lang === 'ar'
+      ? 'تأجير سيارات دبي, سيارات للإيجار في دبي, تأجير سيارات مطار دبي'
+      : 'car rental dubai, rent a car dubai, dubai airport car rental';
+  const title = lang === 'ar' ? post.titleAr : post.title;
+  return `${title}, ${base}`;
 };

@@ -355,7 +355,7 @@ const CarDetailsPage = () => {
           className="absolute inset-0 pointer-events-none"
           style={{
             background:
-              'radial-gradient(ellipse 70% 60% at 50% 0%, hsl(36 42% 46% / 0.07), transparent 65%)',
+              'radial-gradient(ellipse 70% 60% at 50% 0%, hsl(var(--primary) / 0.08), transparent 65%)',
           }}
         />
         <div className="section-container relative py-8 sm:py-12 md:py-16">
@@ -377,7 +377,7 @@ const CarDetailsPage = () => {
               <div className="luxury-divider mt-4 sm:mt-6" />
             </div>
 
-            <div className="border border-border/70 bg-card/70 backdrop-blur-sm p-4 sm:p-8 md:p-10 shadow-soft">
+            <div className="border border-border/60 bg-card shadow-soft p-4 sm:p-6 md:p-8">
               <BookingForm car={car} />
             </div>
           </motion.div>

@@ -8,6 +8,7 @@ interface SEOProps {
   canonical?: string;
   noindex?: boolean;
   lang?: 'ar' | 'en';
+  ogType?: 'website' | 'article';
 }
 
 export const useSEO = ({
@@ -18,6 +19,7 @@ export const useSEO = ({
   canonical,
   noindex = false,
   lang = 'ar',
+  ogType = 'website',
 }: SEOProps) => {
   useEffect(() => {
     document.title = title;
@@ -31,7 +33,7 @@ export const useSEO = ({
 
     updateMetaTag('property', 'og:title', title);
     updateMetaTag('property', 'og:description', description);
-    updateMetaTag('property', 'og:type', 'website');
+    updateMetaTag('property', 'og:type', ogType);
     updateMetaTag('property', 'og:locale', lang === 'ar' ? 'ar_AE' : 'en_AE');
     updateMetaTag(
       'property',
@@ -52,8 +54,8 @@ export const useSEO = ({
     updateMetaTag('name', 'twitter:description', description);
     updateMetaTag('name', 'twitter:image', image);
 
-    updateMetaTag('name', 'robots', noindex ? 'noindex, nofollow' : 'index, follow');
-  }, [title, description, keywords, ogImage, canonical, noindex, lang]);
+    updateMetaTag('name', 'robots', noindex ? 'noindex, nofollow' : 'index, follow, max-image-preview:large');
+  }, [title, description, keywords, ogImage, canonical, noindex, lang, ogType]);
 };
 
 const updateMetaTag = (attribute: string, value: string, content: string) => {

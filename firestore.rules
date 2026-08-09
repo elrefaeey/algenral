@@ -1,0 +1,48 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      // Any authenticated user is treated as admin for this project
+      // (admin panel is the only login surface)
+      return isSignedIn();
+    }
+
+    // Cars — public read, admin write
+    match /cars/{carId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    // Bookings — public can create (booking form), admin manages
+    match /bookings/{bookingId} {
+      allow read: if isAdmin();
+      allow create: if request.resource.data.status == 'pending'
+        && request.resource.data.carId is string
+        && request.resource.data.customerName is string
+        && request.resource.data.customerPhone is string;
+      allow update, delete: if isAdmin();
+    }
+
+    // Blog posts — public reads published only; admin full access
+    match /blogPosts/{postId} {
+      allow read: if resource.data.published == true || isAdmin();
+      allow create, update, delete: if isAdmin();
+    }
+
+    // Site settings + home content
+    match /settings/{docId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    // Deny everything else by default
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
